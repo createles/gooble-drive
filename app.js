@@ -2,9 +2,10 @@ import express from "express";
 import session from "express-session";
 import passport from "passport";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import { prisma } from "./lib/prisma"; // project's prisma client
+import { prisma } from "./lib/prisma.js"; // project's prisma client
 import path from 'path';
 import { fileURLToPath } from "node:url";
+import appRouter from "./routes/appRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
