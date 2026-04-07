@@ -8,5 +8,16 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.6.0",
+    "@quixo3/prisma-session-store": "^3.1.19",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.1.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
   }
 }
