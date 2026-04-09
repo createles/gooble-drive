@@ -6,6 +6,7 @@ import { prisma } from "./lib/prisma.js"; // project's prisma client
 import path from 'path';
 import { fileURLToPath } from "node:url";
 import appRouter from "./routes/appRouter.js";
+import initializePassport from "./config/passport-config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,9 @@ app.use(
     })
   })
 );
+
+// Set up passport configuration
+initializePassport(passport);
 
 // Passport Initialization
 // -- Passport will use sessions from DB --
