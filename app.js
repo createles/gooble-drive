@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from "node:url";
 import appRouter from "./routes/appRouter.js";
 import initializePassport from "./config/passport-config.js";
+import flash from 'connect-flash';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,6 +39,9 @@ app.use(
     })
   })
 );
+
+// enable flash error messages with connect-flash
+app.use(flash());
 
 // Set up passport configuration
 initializePassport(passport);

@@ -1,0 +1,10 @@
+<% if (locals.errorMessage && errorMessage.length > 0) { %>
+  <div class="notif-message error" style="color: red;">
+    <%= errorMessage[0] %>
+  </div>
+<% } %>
+<% if (locals.successMessage && successMessage.length > 0) { %>
+  <div class="notif-message success" style="color: green;">
+    <%= successMessage[0] %>
+  </div>
+<% } %>

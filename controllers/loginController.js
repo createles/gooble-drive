@@ -3,7 +3,8 @@ import passport from "passport";
 export const getLogin = (req, res) => {
   res.render('login', {
     title: 'Gooble Drive - Log in',
-    errorMessage: req.flash('error')
+    errorMessage: req.flash('error'),
+    successMessage: req.flash('success')
   })
 };
 
