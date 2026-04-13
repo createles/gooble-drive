@@ -51,6 +51,12 @@ initializePassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Grab user info and pin to res.locals.currentUser for easy access
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
+
 // Connect to router
 app.use('/', appRouter);
 
