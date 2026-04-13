@@ -1,0 +1,19 @@
+<header class="app-header">
+  <div class="logo-placeholder">
+    <!-- Placeholder -->
+    📁 Gooble Drive
+  </div>
+  
+  <div class="search-bar">
+    <input type="text" placeholder="Search files and folders...">
+  </div>
+
+  <div class="user-profile">
+    <!-- Pass currentUser to display name -->
+    <span class="user-name"><%= currentUser.username %></span>
+    <div class="avatar">
+      <!-- Grabs the first letter of their username for the icon -->
+      <%= currentUser.username.charAt(0).toUpperCase() %>
+    </div>
+  </div>
+</header>

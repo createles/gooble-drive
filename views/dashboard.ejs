@@ -3,9 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %>></title>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css"> 
 </head>
-<body>
-  <h1>Welcome, <%= currentUser.username %></h1>
+<body class="dashboard-layout">
+
+  <%- include('partials/header') %>
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <main class="app-main">
+    
+    <!-- Clickable Navigation Breadcrumbs -->
+    <div class="breadcrumbs">
+      <a href="/dashboard" class="breadcrumb-link">My Drive</a>
+      <!-- We will dynamically add more links here when users click into nested folders -->
+      <!-- Example: <span class="breadcrumb-separator">></span> <a href="#" class="breadcrumb-link">Vacation Photos</a> -->
+    </div>
+
+    <!-- Conditional Rendering based on database contents -->
+    <% if ((locals.folders && folders.length > 0) || (locals.files && files.length > 0)) { %>
+      
+      <div class="item-grid">
+        <!-- We will use an EJS loop here later to render each folder/file -->
+        <!-- Example mock item: -->
+        <div class="grid-item">
+          📄 example-file.pdf
+        </div>
+      </div>
+
+    <% } else { %>
+
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-state-content">
+          <p>This directory is currently empty.</p>
+          <button class="btn-upload">Upload a File or Folder</button>
+        </div>
+      </div>
+
+    <% } %>
+
+  </main>
+
 </body>
 </html>
