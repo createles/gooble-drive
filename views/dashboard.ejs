@@ -10,6 +10,8 @@
 
   <%- include('partials/header') %>
   <%- include('partials/sidebar') %>
+  <%- include('partials/add-btn.ejs') %>
+  <%- include('partials/upload-modal.ejs') %>
 
   <!-- Main Content Area -->
   <main class="app-main">
@@ -38,13 +40,34 @@
       <div class="empty-state">
         <div class="empty-state-content">
           <p>This directory is currently empty.</p>
-          <button class="btn-upload">Upload a File or Folder</button>
+          <button class="btn-upload trigger-modal">Upload a File or Folder</button>
         </div>
       </div>
 
     <% } %>
 
   </main>
+  <script>
+    const modal = document.getElementById('uploadModal');
+    const openBtn = document.getElementById('openUploadModal');
+    const closeBtn = document.getElementById('closeUploadModal');
+    const triggerBtns = document.querySelectorAll('.trigger-modal');
 
+    const toggleModal = () => modal.classList.toggle('active');
+
+    // Open from Floating Button
+    openBtn.addEventListener('click', toggleModal);
+
+    // Open from Empty State Button
+    triggerBtns.forEach(btn => btn.addEventListener('click', toggleModal));
+
+    // Close from X button
+    closeBtn.addEventListener('click', toggleModal);
+
+    // Close if clicking outside the modal content
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) toggleModal();
+    });
+  </script>
 </body>
 </html>
