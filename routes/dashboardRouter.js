@@ -6,4 +6,6 @@ const dashboardRouter = Router();
 
 dashboardRouter.get('/', isAuth, getDashboard);
 
+dashboardRouter.get('/:folderId', isAuth, getDashboard)
+
 export default dashboardRouter;
