@@ -3,6 +3,7 @@ import userRouter from "./userRouter.js";
 import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated import path
 import { getDashboard } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
+import dashboardRouter from "./dashboardRouter.js";
 
 const appRouter = Router();
 
@@ -14,7 +15,7 @@ appRouter.get('/', isLoggedIn, (req, res) => {
 })
 
 appRouter.use('/', userRouter);
-appRouter.get('/dashboard', isAuth, getDashboard);
+appRouter.use('/dashboard', dashboardRouter);
 appRouter.use('/upload', isAuth, upload.single('file'), handleUpload)
 
 
