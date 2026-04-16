@@ -87,6 +87,30 @@
     window.addEventListener('click', (e) => {
       if (e.target === modal) toggleModal();
     });
+
+  // Select Upload Tabs and Forms
+  const tabUpload = document.getElementById('tabUpload');
+  const tabFolder = document.getElementById('tabFolder');
+  const formUpload = document.getElementById('formUploadCont');
+  const formFolder = document.getElementById('formFolderCont');
+
+  // Tab switching helper fx
+  const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
+    activeTab.classList.add('active');
+    activeTab.classList.remove('inactive');
+    inactiveTab.classList.add('inactive');
+    inactiveTab.classList.remove('active');
+    showForm.style.display = 'block';
+    hideForm.style.display = 'none';
+  };
+
+  tabUpload.addEventListener('click', () => {
+    switchTab(tabUpload, tabFolder, formUpload, formFolder);
+  });
+
+  tabFolder.addEventListener('click', () => {
+    switchTab(tabFolder, tabUpload, formFolder, formUpload);
+  });
   </script>
 </body>
 </html>

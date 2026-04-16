@@ -1,25 +1,31 @@
 <div class="modal-overlay" id="uploadModal">
   <div class="modal-content">
-    <div class="modal-header">
-      <h3>Upload to Drive</h3>
+    <div class="modal-header-tabs">
+      <button class="tab-btn active" id="tabUpload">Upload to Drive</button>
+      <button class="tab-btn inactive" id="tabFolder">New Folder</button>
       <button class="close-modal" id="closeUploadModal">&times;</button>
     </div>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
-      <div class="form-group">
-        <label for="file">Choose File</label>
-        <input type="file" name="file" id="file" required>
-      </div>
+    <div id="formUploadCont">
+      <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+        <div class="form-group">
+          <label for="file">Choose File</label>
+          <input type="file" name="file" id="file" required>
+        </div>
+        <input type="hidden" name="parentId" value="<%= locals.currentFolder ? currentFolder.id : '' %>">
+        <button type="submit" class="btn-upload">Upload</button>
+      </form>
+    </div>
 
-      <!-- Logic for folders can be added later as a separate form or field -->
-      <div class="form-group">
-        <label for="folderName">Target Folder (Optional)</label>
-        <select name="folderName" id="select-folder" disabled>
-          <option value="root">Root</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn-upload">Upload</button>
-    </form>
+    <div id="formFolderCont" style="display: none;">
+      <form action="/folders/create" method="POST" class="upload-form">
+        <div class="form-group">
+          <label for="folderName">Folder Name</label>
+          <input type="text" name="name" id="folderName" placeholder="Untitled Folder" required>
+        </div>
+        <input type="hidden" name="parentId" value="<%= locals.currentFolder ? currentFolder.id : '' %>">
+        <button type="submit" class="btn-upload">Create</button>
+      </form>
+    </div>
   </div>
 </div>
