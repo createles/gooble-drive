@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>Gooble Drive - <%= title %></title>
   <link rel="stylesheet" href="/style.css"> 
 </head>
 <body class="dashboard-layout">
@@ -19,19 +19,38 @@
     <!-- Clickable Navigation Breadcrumbs -->
     <div class="breadcrumbs">
       <a href="/dashboard" class="breadcrumb-link">My Drive</a>
-      <!-- We will dynamically add more links here when users click into nested folders -->
-      <!-- Example: <span class="breadcrumb-separator">></span> <a href="#" class="breadcrumb-link">Vacation Photos</a> -->
+      
+      <% if (currentFolder) { %>
+        <span class="breadcrumb-separator">></span>
+        <a href="/dashboard/<%= currentFolder.id %>" class="breadcrumb-link">
+          <%= currentFolder.name %>
+        </a>
+      <% } %>
+      
     </div>
 
     <!-- Conditional Rendering based on database contents -->
     <% if ((locals.folders && folders.length > 0) || (locals.files && files.length > 0)) { %>
       
       <div class="item-grid">
-        <!-- We will use an EJS loop here later to render each folder/file -->
-        <!-- Example mock item: -->
+        <!-- Loop over folders -->
+        <% folders.forEach(folder => { %>
+        <a href="/dashboard/<%= folder.id %>" class="grid-item">
+          <div class="folder-icon" style="font-size: 2rem;">📁</div>
+          <div class="item-name"><%= folder.name %></div>
+        </a>
+      <% }) %>
+
+      <!-- Loop over files -->
+      <% files.forEach(file => { %>
         <div class="grid-item">
-          📄 example-file.pdf
+          <div class="file-icon" style="font-size: 2rem;">📄</div>
+          <div class="item-name"><%= file.name %></div>
+          <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
+            <%= (file.size / 1024).toFixed(1) %> KB
+          </div>
         </div>
+      <% }) %>
       </div>
 
     <% } else { %>
