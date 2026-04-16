@@ -46,3 +46,21 @@ export const getDashboard = async (req, res) => {
     res.status(500).send("Error loading dashboard");
   }
 }
+
+export const postCreateFolder = async (req, res, next) => {
+  try {
+    await prisma.folder.create({
+      data: {
+        name: req.body.name,
+        userId: req.user.id,
+        parentId: req.body.parentId ? parseInt(req.body.parentId) : null
+      }
+    })
+
+    const redirectUrl = parentId ? `/dashboard/${parentId}` : '/dashboard';
+    res.redirect(redirectUrl);
+  } catch (err) {
+    console.error("Folder creation error:", err);
+    res.redirect('/dashboard');
+  }
+}

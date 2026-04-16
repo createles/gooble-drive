@@ -1,7 +1,7 @@
 import { Router } from "express";
 import userRouter from "./userRouter.js";
 import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated import path
-import { getDashboard } from "../controllers/dashboardController.js";
+import { getDashboard, postCreateFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
 
@@ -16,7 +16,8 @@ appRouter.get('/', isLoggedIn, (req, res) => {
 
 appRouter.use('/', userRouter);
 appRouter.use('/dashboard', dashboardRouter);
-appRouter.use('/upload', isAuth, upload.single('file'), handleUpload)
+appRouter.use('/upload', isAuth, upload.single('file'), handleUpload);
+appRouter.post('/folders/create', isAuth, postCreateFolder);
 
 
 export default appRouter;
