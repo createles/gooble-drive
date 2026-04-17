@@ -12,6 +12,7 @@
   <%- include('partials/sidebar') %>
   <%- include('partials/add-btn.ejs') %>
   <%- include('partials/upload-modal.ejs') %>
+  <%- include('partials/options-menu.ejs') %>
 
   <!-- Main Content Area -->
   <main class="app-main">
@@ -36,6 +37,7 @@
         <!-- Loop over folders -->
         <% folders.forEach(folder => { %>
         <a href="/dashboard/<%= folder.id %>" class="grid-item">
+          <button class="options-btn">&#8942;</button>
           <div class="folder-icon" style="font-size: 2rem;">📁</div>
           <div class="item-name"><%= folder.name %></div>
         </a>
@@ -44,6 +46,7 @@
       <!-- Loop over files -->
       <% files.forEach(file => { %>
         <div class="grid-item">
+          <button class="options-btn">&#8942;</button>
           <div class="file-icon" style="font-size: 2rem;">📄</div>
           <div class="item-name"><%= file.name %></div>
           <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
@@ -76,41 +79,68 @@
 
     // Open from Floating Button
     openBtn.addEventListener('click', toggleModal);
-
     // Open from Empty State Button
     triggerBtns.forEach(btn => btn.addEventListener('click', toggleModal));
-
     // Close from X button
     closeBtn.addEventListener('click', toggleModal);
 
-    // Close if clicking outside the modal content
+    // --- Options Menu Logic ---
+    const optionsMenu = document.getElementById('optionsMenu');
+    const optionsBtns = document.querySelectorAll('.options-btn');
+
+    const showOptionsMenu = (event) => {
+      optionsMenu.classList.remove('active')
+      event.preventDefault(); // Prevent <a> tag navigation
+      event.stopPropagation(); // Stop click from bubbling
+      optionsMenu.style.top = `${event.pageY}px`;
+      optionsMenu.style.left = `${event.pageX}px`;
+      setTimeout(() => {
+        optionsMenu.classList.add('active');
+      }, 50)
+    };
+
+    const hideOptionsMenu = () => {
+      optionsMenu.classList.remove('active');
+    };
+
+    optionsBtns.forEach(btn => btn.addEventListener('click', showOptionsMenu));
+
+    // Close menus when clicking elsewhere or pressing Escape
     window.addEventListener('click', (e) => {
+      // Close modal if clicking on the overlay
       if (e.target === modal) toggleModal();
+      // Close options menu if clicking outside
+      if (optionsMenu.classList.contains('active') && !optionsMenu.contains(e.target) && !e.target.closest('.options-btn')) {
+        hideOptionsMenu();
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideOptionsMenu();
     });
 
-  // Select Upload Tabs and Forms
-  const tabUpload = document.getElementById('tabUpload');
-  const tabFolder = document.getElementById('tabFolder');
-  const formUpload = document.getElementById('formUploadCont');
-  const formFolder = document.getElementById('formFolderCont');
+    // Select Upload Tabs and Forms
+    const tabUpload = document.getElementById('tabUpload');
+    const tabFolder = document.getElementById('tabFolder');
+    const formUpload = document.getElementById('formUploadCont');
+    const formFolder = document.getElementById('formFolderCont');
 
-  // Tab switching helper fx
-  const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
-    activeTab.classList.add('active');
-    activeTab.classList.remove('inactive');
-    inactiveTab.classList.add('inactive');
-    inactiveTab.classList.remove('active');
-    showForm.style.display = 'block';
-    hideForm.style.display = 'none';
-  };
+    // Tab switching helper fx
+    const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
+      activeTab.classList.add('active');
+      activeTab.classList.remove('inactive');
+      inactiveTab.classList.add('inactive');
+      inactiveTab.classList.remove('active');
+      showForm.style.display = 'block';
+      hideForm.style.display = 'none';
+    };
 
-  tabUpload.addEventListener('click', () => {
-    switchTab(tabUpload, tabFolder, formUpload, formFolder);
-  });
+    tabUpload.addEventListener('click', () => {
+      switchTab(tabUpload, tabFolder, formUpload, formFolder);
+    });
 
-  tabFolder.addEventListener('click', () => {
-    switchTab(tabFolder, tabUpload, formFolder, formUpload);
-  });
+    tabFolder.addEventListener('click', () => {
+      switchTab(tabFolder, tabUpload, formFolder, formUpload);
+    });
   </script>
 </body>
 </html>
