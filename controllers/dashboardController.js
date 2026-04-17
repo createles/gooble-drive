@@ -49,11 +49,12 @@ export const getDashboard = async (req, res) => {
 
 export const postCreateFolder = async (req, res, next) => {
   try {
+    const { name, parentId } = req.body;
     await prisma.folder.create({
       data: {
-        name: req.body.name,
+        name: name,
         userId: req.user.id,
-        parentId: req.body.parentId ? parseInt(req.body.parentId) : null
+        parentId: parentId ? parseInt(parentId) : null
       }
     })
 
