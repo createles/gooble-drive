@@ -48,8 +48,11 @@ export const getDashboard = async (req, res) => {
 }
 
 export const postCreateFolder = async (req, res, next) => {
+  
+  // Grab name and parentId from form
+  const { name, parentId } = req.body;
+
   try {
-    const { name, parentId } = req.body;
     await prisma.folder.create({
       data: {
         name: name,
@@ -62,6 +65,8 @@ export const postCreateFolder = async (req, res, next) => {
     res.redirect(redirectUrl);
   } catch (err) {
     console.error("Folder creation error:", err);
-    res.redirect('/dashboard');
+
+    const redirectUrl = parentid ? `/dashboard/${parentId}` : '/dashboard';
+    res.redirect(redirectUrl);
   }
 }

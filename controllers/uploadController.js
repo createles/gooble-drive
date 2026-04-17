@@ -36,6 +36,10 @@ export const upload = multer({
 
 // Upload logic
 export const handleUpload = async (req, res) => {
+
+  // Grab current folder id (the parent folder)
+  const parentId = req.body.parentId;
+
   try {
     if (!req.file) {
       req.flash("error", "No file selected.");
@@ -49,15 +53,19 @@ export const handleUpload = async (req, res) => {
         path: req.file.path,
         size: req.file.size,
         userId: req.user.id,
-        // folderId: null // For now, everything goes to root
+        folderId: parentId ? parseInt(parentId) : null
       },
     });
 
     req.flash("success", "File uploaded successfully!");
-    res.redirect("/dashboard");
+    
+    const redirectUrl = parentId ? `/dashboard/${parentId}` : "/dashboard";
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error("Upload error:", error);
     req.flash("error", "An error occurred during upload.");
-    res.redirect("/dashboard");
+
+    const redirectUrl = parentId ? `/dashboard/${parentId}` : "/dashboard";
+    res.redirect(redirectUrl);
   }
 };
