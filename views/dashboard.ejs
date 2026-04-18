@@ -36,7 +36,12 @@
       <div class="item-grid">
         <!-- Loop over folders -->
         <% folders.forEach(folder => { %>
-        <a href="/dashboard/<%= folder.id %>" class="grid-item">
+        <a href="/dashboard/<%= folder.id %>" 
+          class="grid-item"
+          data-type="Folder"
+          data-name="<%= folder.name %>"
+          data-size=""
+          data-date="<%= folder.createdOn.toDateString() %>">
           <button class="options-btn">&#8942;</button>
           <div class="folder-icon" style="font-size: 2rem;">📁</div>
           <div class="item-name"><%= folder.name %></div>
@@ -45,7 +50,11 @@
 
       <!-- Loop over files -->
       <% files.forEach(file => { %>
-        <div class="grid-item">
+        <div class="grid-item"
+          data-type="File" 
+          data-name="<%= file.name %>" 
+          data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
+          data-date="<%= file.uploadTime.toDateString() %>">
           <button class="options-btn">&#8942;</button>
           <div class="file-icon" style="font-size: 2rem;">📄</div>
           <div class="item-name"><%= file.name %></div>
@@ -69,6 +78,11 @@
     <% } %>
 
   </main>
+
+  <!-- Details Modal Pane -->
+  <%- include('partials/details.ejs') %>
+
+  
   <script>
     const modal = document.getElementById('uploadModal');
     const openBtn = document.getElementById('openUploadModal');
@@ -84,7 +98,59 @@
     // Close from X button
     closeBtn.addEventListener('click', toggleModal);
 
-    // --- Options Menu Logic ---
+  // --- Grid-Item Click Logic ---
+    const gridItems = document.querySelectorAll('.grid-item');
+    const dashboardLayout = document.querySelector('.dashboard-layout'); // Target the layout container
+
+    let activeItemData = {};
+
+    const showDetailsModal = (event) => {
+      const item = event.currentTarget;
+      
+      // Update Details modal with item data
+      activeItemData = {
+        name: item.dataset.name,
+        type: item.dataset.type,
+        size: item.dataset.size,
+        date: item.dataset.date
+      };
+
+      document.getElementById('detail-name').textContent = activeItemData.name;
+      document.getElementById('detail-type').textContent = activeItemData.type;
+      document.getElementById('detail-size').textContent = activeItemData.size;
+      document.getElementById('detail-date').textContent = activeItemData.date;
+
+      // ONLY trigger the entrance animation if the panel is currently hidden
+      if (!dashboardLayout.classList.contains('show-details')) {
+        dashboardLayout.classList.remove('show-details');
+        setTimeout(() => {
+          dashboardLayout.classList.add('show-details');
+        }, 50);
+      }
+    };
+
+    gridItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.currentTarget.tagName === 'A') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        // CRITICAL: Pass the event 'e' into the function!
+        showDetailsModal(e); 
+      });
+
+      item.addEventListener('dblclick', (e) => {
+        const destination = e.currentTarget.getAttribute('href');
+        if (destination) {
+          window.location.href = destination;
+        }
+      });
+    });
+
+    const closeDetails = document.querySelector('#closeDetails');
+    closeDetails.addEventListener('click', () => dashboardLayout.classList.remove('show-details'));
+
+  // --- Options Menu Logic ---
     const optionsMenu = document.getElementById('optionsMenu');
     const optionsBtns = document.querySelectorAll('.options-btn');
 
