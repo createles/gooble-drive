@@ -33,6 +33,7 @@ model User {
 model Folder {
   id        Int      @id @default(autoincrement())
   name      String
+  createdOn DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   files     File[]   
