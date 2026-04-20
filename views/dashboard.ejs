@@ -129,11 +129,9 @@
 
     gridItems.forEach(item => {
       item.addEventListener('click', (e) => {
-        if (e.currentTarget.tagName === 'A') {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        // CRITICAL: Pass the event 'e' into the function!
+        e.preventDefault();
+        e.stopPropagation();
+        // Pass e to provide click target element
         showDetailsModal(e); 
       });
 
