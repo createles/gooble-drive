@@ -101,6 +101,7 @@
   // --- Grid-Item Click Logic ---
     const gridItems = document.querySelectorAll('.grid-item');
     const dashboardLayout = document.querySelector('.dashboard-layout'); // Target the layout container
+    const detailsModal = document.querySelector('#details-modal');
 
     let activeItemData = {};
 
@@ -144,6 +145,7 @@
       });
     });
 
+    // Close button in Details Pane 
     const closeDetails = document.querySelector('#closeDetails');
     closeDetails.addEventListener('click', () => dashboardLayout.classList.remove('show-details'));
 
@@ -175,6 +177,10 @@
       // Close options menu if clicking outside
       if (optionsMenu.classList.contains('active') && !optionsMenu.contains(e.target) && !e.target.closest('.options-btn')) {
         hideOptionsMenu();
+      }
+      // Close details pane if clicking elsewhere
+      if (dashboardLayout.classList.contains('show-details') && !detailsModal.contains(e.target)) {
+        dashboardLayout.classList.remove('show-details');
       }
     });
     window.addEventListener('keydown', (e) => {
