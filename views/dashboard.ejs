@@ -122,10 +122,7 @@
 
       // ONLY trigger the entrance animation if the panel is currently hidden
       if (!dashboardLayout.classList.contains('show-details')) {
-        dashboardLayout.classList.remove('show-details');
-        setTimeout(() => {
-          dashboardLayout.classList.add('show-details');
-        }, 50);
+        dashboardLayout.classList.add('show-details');
       }
     };
 

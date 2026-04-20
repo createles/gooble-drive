@@ -28,34 +28,36 @@ a {
 /* Dashboard Application Layout */
 .dashboard-layout {
   display: grid;
-  grid-template-columns: 250px 1fr 0px; /* Sidebar width, then the rest */
+  grid-template-columns: 250px 1fr; /* Sidebar width, then the rest */
   grid-template-rows: 64px 1fr;     /* Header height, then the rest */
   grid-template-areas: 
-    "header header header"
-    "sidebar main details";
+    "header header"
+    "sidebar main";
   height: 100vh;
   overflow: hidden; /* Prevents whole page scrolling, limits to main container */
-  transition: grid-template-columns 0.3s ease; /* Smooth sliding effect */
-}
-
-.dashboard-layout.show-details {
-  grid-template-columns: 250px 1fr 300px;
+  position: relative; /* Establish positioning context for absolute children */
 }
 
 #details-modal {
   visibility: hidden;
   opacity: 0;
-  grid-area: details;
-  border-left: 0px solid var(--border-color); /* Hide border when closed */
-  background: var(--bg-secondary);
-  overflow: hidden;
-  transition: opacity 0.3s ease;
+  position: absolute; /* Make it an overlay */
+  top: 64px; /* Position below the header */
+  right: 0;
+  bottom: 0;
+  width: 300px; /* Fixed width for the details panel */
+  z-index: 20; /* Ensure it's above other content */
+  border-left: 1px solid var(--border-light); /* Always show border, or transition it */
+  background-color: var(--surface-color); /* Use a defined background color */
+  overflow-y: auto; /* Allow scrolling within the details panel */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; /* Add transform for sliding effect */
+  transform: translateX(100%); /* Start off-screen to the right */
 }
 
 .dashboard-layout.show-details #details-modal {
   visibility: visible;
   opacity: 1;
-  border-left: 1px solid var(--border-color); /* Show border when open */
+  transform: translateX(0); /* Slide into view */
 }
 
 /* Header Partial */
