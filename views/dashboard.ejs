@@ -51,7 +51,8 @@
       <!-- Loop over files -->
       <% files.forEach(file => { %>
         <div class="grid-item"
-          data-type="File" 
+          data-type="File"
+          data-id="<%= file.id %>" 
           data-name="<%= file.name %>" 
           data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
           data-date="<%= file.uploadTime.toDateString() %>">
@@ -150,11 +151,13 @@
   // --- Options Menu Logic ---
     const optionsMenu = document.getElementById('optionsMenu');
     const optionsBtns = document.querySelectorAll('.options-btn');
+    const optionsDownloadBtn = document.querySelector('#options-dl-btn');
 
     const showOptionsMenu = (event) => {
       optionsMenu.classList.remove('active')
       event.preventDefault(); // Prevent <a> tag navigation
       event.stopPropagation(); // Stop click from bubbling
+      optionsDownloadBtn.href = `/download/${event.target.closest(".grid-item").dataset.id}`
       optionsMenu.style.top = `${event.pageY}px`;
       optionsMenu.style.left = `${event.pageX}px`;
       setTimeout(() => {
