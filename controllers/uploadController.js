@@ -50,7 +50,7 @@ export const handleUpload = async (req, res) => {
     await prisma.file.create({
       data: {
         name: req.file.originalname,
-        path: req.file.path,
+        url: req.file.path, // USE url FOR SCHEMA METADATA; path FOR file's original location
         size: req.file.size,
         userId: req.user.id,
         folderId: parentId ? parseInt(parentId) : null
