@@ -29,3 +29,31 @@ export const startDownload = async (req, res) => {
   res.download(file.url, file.name); 
 }
 
+export const generateShareLink = async (req, res) => {
+  try {
+    const { fileId, duration } = req.body; // Grab from a fetch request
+    
+    // Calculate expiration date object
+    // in milliseconds (e.g., 1 day = 86400000)
+    const expiresAt = new Date(Date.now() + parseInt(duration));
+
+    // Create the share record
+    const sharedFile = await prisma.share.create({
+      data: {
+        fileId: parseInt(fileId),
+        expiresAt: expiresAt
+      }
+    });
+
+    // Send the UUID (sharedFile.id) back to the client
+    // Use req.get('host') to build a full URL automatically
+    const fullUrl = `${req.protocol}://${req.get('host')}/share/${sharedFile.id}`;
+    
+    // Return json with shareLink
+    return res.json({ shareLink: fullUrl });
+
+  } catch (err) {
+    console.error("Failed to generate shareable Link:", err);
+    return res.status(500).json({ error: "Could not generate link." });
+  }
+}
