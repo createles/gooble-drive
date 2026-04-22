@@ -1,0 +1,31 @@
+<div id="shareModal" class="modal-overlay modal">
+  <div class="modal-content"> 
+    <h3>Share File</h3>
+    
+    <div id="shareSetup" class="modal-section">
+      <input type="hidden" id="shareFileId">
+      
+      <label for="shareDuration">Link Duration:</label>
+      <select id="shareDuration">
+        <!-- values in miliseconds -->
+        <option value="3600000">1 Hour</option>
+        <option value="86400000" selected>1 Day</option>
+        <option value="604800000">1 Week</option>
+      </select>
+      
+      <div class="modal-buttons"> 
+        <button onclick="closeShareModal()">Close</button>
+        <button class="btn-primary" onclick="handleShareClick()">Generate Link</button>
+      </div>
+    </div>
+
+    <div id="shareResult" class="modal-section">
+      <p>Your shareable link is ready:</p>
+      <div class="link-copy-box">
+        <input type="text" id="generatedLink" readonly>
+        <button onclick="copyGeneratedLink()">Copy Link</button>
+      </div>
+      <button onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
