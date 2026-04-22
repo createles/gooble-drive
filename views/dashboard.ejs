@@ -251,7 +251,7 @@
   // Close menus when clicking elsewhere or pressing Escape
   window.addEventListener('click', (e) => {
     // Close modal if clicking on the overlay
-    if (e.target === modal) toggleModal();
+    if (e.target === uploadModal) toggleModal();
     // Close options menu if clicking outside
     if (optionsMenu.classList.contains('active') && !optionsMenu.contains(e.target) && !e.target.closest('.options-btn')) {
       hideOptionsMenu();
