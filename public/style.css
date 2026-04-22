@@ -38,7 +38,7 @@ a {
   position: relative; /* Establish positioning context for absolute children */
 }
 
-#details-modal {
+#detailsModal {
   visibility: hidden;
   opacity: 0;
   position: absolute; /* Make it an overlay */
@@ -54,7 +54,7 @@ a {
   transform: translateX(100%); /* Start off-screen to the right */
 }
 
-.dashboard-layout.show-details #details-modal {
+.dashboard-layout.show-details #detailsModal {
   visibility: visible;
   opacity: 1;
   transform: translateX(0); /* Slide into view */
@@ -499,3 +499,5 @@ a {
   border-radius: 8px;
   background-color: var(--bg-color);
 }
+
+/* SHARE MODAL STYLES */
