@@ -251,6 +251,7 @@ a {
   -moz-appearance: none;    /* For Firefox */
   appearance: none;         /* Standard */
   cursor: pointer;
+  color: #000000;
   font-size: 0.9rem;
   font-family: inherit; /* Inherit from body for consistency */
   font-weight: 500;     /* Explicitly set font-weight to match common button styles */
@@ -295,12 +296,14 @@ a {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, background-color 0.2s;
 }
 
 .btn-upload:hover {
+  background-color: #0842a0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
+
 
 /* Index and Auth Pages (Login, Signup, Home) */
 .hero-banner, .members-login, .login-cont, .sign-up-cont {
@@ -345,23 +348,6 @@ a {
 .floating-add-btn:hover {
   background-color: var(--hover-bg);
   transform: scale(1.1);
-}
-
-.btn-upload {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 24px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: box-shadow 0.2s, background-color 0.2s;
-}
-
-.btn-upload:hover {
-  background-color: #0842a0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
 /* =========================================
