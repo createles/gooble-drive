@@ -261,8 +261,10 @@
       dashboardLayout.classList.remove('show-details');
     }
 
-    // HIDE MODAL WHEN CLICKING OUT
-    // if (share)
+    // Hide modal when clicking out
+    if (shareModal.classList.contains('active') && e.target === shareModal) {
+      closeShareModal();
+    }
   });
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') hideOptionsMenu();
