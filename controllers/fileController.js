@@ -57,3 +57,24 @@ export const generateShareLink = async (req, res) => {
     return res.status(500).json({ error: "Could not generate link." });
   }
 }
+
+export const deleteFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+
+    // 1. Fetch file to get the URL/Path for storage deletion
+    const file = await prisma.file.findUnique({ where: { id: parseInt(fileId) } });
+    
+    if (!file) return res.status(404).json({ error: "File not found" });
+
+    // [FUTURE CLOUD LOGIC HERE]: call cloudinary.uploader.destroy(file.publicId)
+
+    // 2. Delete from Database
+    await prisma.file.delete({ where: { id: parseInt(fileId) } });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete Error:", err);
+    res.status(500).json({ error: "Failed to delete file" });
+  }
+};
