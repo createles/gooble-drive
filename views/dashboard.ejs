@@ -40,8 +40,9 @@
         <a href="/dashboard/<%= folder.id %>" 
           class="grid-item"
           data-type="Folder"
+          data-id="<%= folder.id %>"
           data-name="<%= folder.name %>"
-          data-size=""
+          data-size="---"
           data-date="<%= folder.createdOn.toDateString() %>">
           <button class="options-btn">&#8942;</button>
           <div class="folder-icon" style="font-size: 2rem;">📁</div>
@@ -73,7 +74,7 @@
       <div class="empty-state">
         <div class="empty-state-content">
           <p>This directory is currently empty.</p>
-          <button class="btn-upload trigger-modal">Upload a File or Folder</button>
+          <button class="btn-upload empty-upload-btn">Upload a File or Folder</button>
         </div>
       </div>
 
@@ -84,190 +85,196 @@
   <%- include('partials/details-modal.ejs') %>
   
   <script>
-    const uploadModal = document.getElementById('uploadModal');
-    const openBtn = document.getElementById('openUploadModal');
-    const closeBtn = document.getElementById('closeUploadModal');
-    const triggerBtns = document.querySelectorAll('.trigger-modal');
 
-    const toggleModal = () => uploadModal.classList.toggle('active');
+    // --- DOM ELEMENTS ---
+    const dom = {
+    layout: document.querySelector('.dashboard-layout'),
+    grid: document.querySelector('.item-grid'),
+    modals: {
+      upload: document.getElementById('uploadModal'),
+      details: document.getElementById('detailsModal'),
+      share: document.getElementById('shareModal')
+    },
+    details: {
+      name: document.getElementById('detailName'),
+      type: document.getElementById('detailType'),
+      size: document.getElementById('detailSize'),
+      date: document.getElementById('detailDate')
+    },
+    share: {
+      setup: document.getElementById('shareSetup'),
+      result: document.getElementById('shareResult'),
+      fileId: document.getElementById('shareFileId'),
+      duration: document.getElementById('shareDuration'),
+      linkInput: document.getElementById('generatedLink')
+    },
+    optionsMenu: document.getElementById('optionsMenu'),
+    optionsDlBtn: document.getElementById('optionsDlBtn'),
+    optionsShareBtn: document.getElementById('optionsShareBtn')
+  };
 
-    // Open from Floating Button
-    openBtn.addEventListener('click', toggleModal);
-    // Open from Empty State Button
-    triggerBtns.forEach(btn => btn.addEventListener('click', toggleModal));
-    // Close from X button
-    closeBtn.addEventListener('click', toggleModal);
+  // --- SET GLOBAL CURRENT ACTIVE FILE ---
+  let currentActiveFileId = null;
 
-  // --- GRID-ITEM CLICK LOGIC ---
-    const gridItems = document.querySelectorAll('.grid-item');
-    const dashboardLayout = document.querySelector('.dashboard-layout'); // Target the layout container
-    const detailsModal = document.querySelector('#detailsModal');
-    const shareModal = document.querySelector('#shareModal');
+  // --- VISIBILITY TOGGLE HELPER ---
+  const toggleUI = (el, force) => el.classList.toggle('active', force);
 
-    let activeItemData = {};
+  // --- GRID ITEM BEHAVIOR ---
 
-    const showDetailsModal = (event) => {
-      const item = event.currentTarget;
-      
-      // Update Details modal with item data
-      activeItemData = {
-        name: item.dataset.name,
-        type: item.dataset.type,
-        size: item.dataset.size,
-        date: item.dataset.date
-      };
+  // FIX: Rewrote event listeners to be a single Event Delegation listener on the parent
+  // .item-grid for efficiency and brevity 
+  dom.grid?.addEventListener('click', (e) => {
+    const item = e.target.closest('.grid-item');
+    if (!item || e.target.closest('.options-btn')) return;
 
-      document.getElementById('detailName').textContent = activeItemData.name;
-      document.getElementById('detailType').textContent = activeItemData.type;
-      document.getElementById('detailSize').textContent = activeItemData.size;
-      document.getElementById('detailDate').textContent = activeItemData.date;
+    // FIX: "Stop" navigation on single click for folders
+    if (item.tagName === 'A') e.preventDefault();
 
-      // ONLY trigger the entrance animation if the panel is currently hidden
-      if (!dashboardLayout.classList.contains('show-details')) {
-        dashboardLayout.classList.add('show-details');
-      }
-    };
+    // Populate Details Pane
+    dom.details.name.textContent = item.dataset.name;
+    dom.details.type.textContent = item.dataset.type;
+    dom.details.size.textContent = item.dataset.size;
+    dom.details.date.textContent = item.dataset.date;
 
-    gridItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Pass e to provide click target element
-        showDetailsModal(e); 
-      });
+    // Trigger Slide-out Layout
+    dom.layout.classList.add('show-details');
+  });
 
-      item.addEventListener('dblclick', (e) => {
-        const destination = e.currentTarget.getAttribute('href');
-        if (destination) {
-          window.location.href = destination;
-        }
-      });
-    });
-
-    // Close button in Details Pane 
-    const closeDetails = document.querySelector('#closeDetails');
-    closeDetails.addEventListener('click', () => dashboardLayout.classList.remove('show-details'));
+  // Double click allows navigating into a folder
+  dom.grid?.addEventListener('dblclick', (e) => {
+    const item = e.target.closest('.grid-item');
+    const destination = item?.getAttribute('href');
+    // "Go" navigation on double click
+    if (destination) window.location.href = destination;
+  });
 
   // --- OPTIONS MENU LOGIC ---
-    const optionsMenu = document.getElementById('optionsMenu');
-    const optionsBtns = document.querySelectorAll('.options-btn');
-    const optionsDownloadBtn = document.querySelector('#optionsDlBtn');
-    const optionsShareBtn = document.querySelector('#optionsShareBtn');
+  const showOptionsMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const item = e.target.closest('.grid-item');
+    currentActiveFileId = item.dataset.id;
 
-    const showOptionsMenu = (event) => {
-      optionsMenu.classList.remove('active')
-      event.preventDefault(); // Prevent <a> tag navigation
-      event.stopPropagation(); // Stop click from bubbling
-      optionsDownloadBtn.href = `/download/${event.target.closest(".grid-item").dataset.id}`
-      optionsShareBtn.dataset.id = event.target.closest('.grid-item').dataset.id;
-      optionsMenu.style.top = `${event.pageY}px`;
-      optionsMenu.style.left = `${event.pageX}px`;
-      setTimeout(() => {
-        optionsMenu.classList.add('active');
-      }, 50)
-    };
+    // Update Menu Buttons
+    dom.optionsDlBtn.href = `/download/${currentActiveFileId}`;
+    dom.optionsShareBtn.dataset.id = currentActiveFileId;
 
-    const hideOptionsMenu = () => {
-      optionsMenu.classList.remove('active');
-    };
+    // Position and Show
+    dom.optionsMenu.style.top = `${e.pageY}px`;
+    dom.optionsMenu.style.left = `${e.pageX}px`;
+    toggleUI(dom.optionsMenu, true);
+  };
 
-    optionsBtns.forEach(btn => btn.addEventListener('click', showOptionsMenu));
+  document.querySelectorAll('.options-btn').forEach(btn => 
+    btn.addEventListener('click', showOptionsMenu)
+  );
 
-    // Select Upload Tabs and Forms
-    const tabUpload = document.getElementById('tabUpload');
-    const tabFolder = document.getElementById('tabFolder');
-    const formUpload = document.getElementById('formUploadCont');
-    const formFolder = document.getElementById('formFolderCont');
+  // --- SHARE FEATURE (Fetch API) ---
+  const openShareModal = (fileId) => {
+    dom.share.fileId.value = fileId;
+    // toggleUI(dom.share.setup, true);
+    // toggleUI(dom.share.result, false);
+    toggleUI(dom.modals.share, true);
+  };
 
-    // Tab switching helper fx
-    const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
-      activeTab.classList.add('active');
-      activeTab.classList.remove('inactive');
-      inactiveTab.classList.add('inactive');
-      inactiveTab.classList.remove('active');
-      showForm.style.display = 'block';
-      hideForm.style.display = 'none';
-    };
+  dom.optionsShareBtn?.addEventListener('click', () => {
+    dom.optionsMenu.classList.remove('active');
+    openShareModal(currentActiveFileId);
+  });
 
-    tabUpload.addEventListener('click', () => {
-      switchTab(tabUpload, tabFolder, formUpload, formFolder);
-    });
-
-    tabFolder.addEventListener('click', () => {
-      switchTab(tabFolder, tabUpload, formFolder, formUpload);
-    });
-  
-  // --- SHARE MODAL LOGIC ---
-  // Opens modal and populates the hidden file ID
-  function openShareModal(fileId) {
-    document.getElementById('shareFileId').value = fileId;
-    document.getElementById('shareModal').classList.add('active');
-  }
-
-  // Gather data and sends the fetch request
   async function handleShareClick() {
-    const fileId = document.getElementById('shareFileId').value;
-    const duration = document.getElementById('shareDuration').value;
+    // payload = file to share's id and selected duration
+    const payload = {
+      fileId: dom.share.fileId.value,
+      duration: dom.share.duration.value
+    };
 
     try {
       const response = await fetch('/files/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileId, duration })
+        body: JSON.stringify(payload)
       });
-
       const data = await response.json();
 
       if (data.shareLink) {
-        document.getElementById('generatedLink').value = data.shareLink;
-        document.getElementById('shareSetup').classList.remove('active');
-        document.getElementById('shareResult').classList.add('active');
+        dom.share.linkInput.value = data.shareLink;
+        // toggleUI(dom.share.setup, false);
+        // toggleUI(dom.share.result, true);
       }
     } catch (err) {
-      console.error("Failed to generate link", err);
-      alert("Could not generate shareable link. Please try again.");
+      console.error("Share failed", err);
+      alert("Could not generate link.");
     }
   }
 
-  function closeShareModal() {
-    document.getElementById('shareModal').classList.remove('active');
-  }
-
-  // Copy link button handler
-  async function copyGeneratedLink() { 
-    const linkInput = document.getElementById('generatedLink');
-    await navigator.clipboard.writeText(linkInput.value);
+  async function copyGeneratedLink() {
+    await navigator.clipboard.writeText(dom.share.linkInput.value);
     alert("Link copied to clipboard!");
   }
-  
-  // Share button click behavior
-  const shareBtn = document.getElementById('optionsShareBtn');
-  shareBtn.addEventListener('click', (e) => {
-    const fileId = e.target.dataset.id;
-    hideOptionsMenu();
-    openShareModal(fileId);
+
+  // --- UPLOAD MODAL ---
+  const openUploadModal = () => toggleUI(dom.modals.upload, true);
+  const tabUpload = document.getElementById('tabUpload');
+  const tabFolder = document.getElementById('tabFolder');
+  const formUpload = document.getElementById('formUploadCont');
+  const formFolder = document.getElementById('formFolderCont');
+  document.getElementById('openUploadModal')?.addEventListener('click', openUploadModal);
+  document.querySelector('.empty-upload-btn')?.addEventListener('click', openUploadModal);
+
+
+  // Tab Switching Helper
+  const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
+    activeTab.classList.add('active');
+    activeTab.classList.remove('inactive');
+    inactiveTab.classList.add('inactive');
+    inactiveTab.classList.remove('active');
+    showForm.style.display = 'block';
+    hideForm.style.display = 'none';
+  };
+
+  tabUpload.addEventListener('click', () => {
+    switchTab(tabUpload, tabFolder, formUpload, formFolder);
   });
 
-  // Close menus when clicking elsewhere or pressing Escape
+  tabFolder.addEventListener('click', () => {
+    switchTab(tabFolder, tabUpload, formFolder, formUpload);
+  });
+
+  // --- GLOBAL CLOSING LOGIC ---
   window.addEventListener('click', (e) => {
-    // Close modal if clicking on the overlay
-    if (e.target === uploadModal) toggleModal();
+    // Close modals if dark overlay is clicked
+    if (e.target === dom.modals.upload) toggleUI(dom.modals.upload, false);
+    if (e.target === dom.modals.share) toggleUI(dom.modals.share, false);
+
     // Close options menu if clicking outside
-    if (optionsMenu.classList.contains('active') && !optionsMenu.contains(e.target) && !e.target.closest('.options-btn')) {
-      hideOptionsMenu();
-    }
-    // Close details pane if clicking elsewhere
-    if (dashboardLayout.classList.contains('show-details') && !detailsModal.contains(e.target)) {
-      dashboardLayout.classList.remove('show-details');
+    if (dom.optionsMenu.classList.contains('active') && !dom.optionsMenu.contains(e.target)) {
+      dom.optionsMenu.classList.remove('active');
     }
 
-    // Hide modal when clicking out
-    if (shareModal.classList.contains('active') && e.target === shareModal) {
-      closeShareModal();
+    // Close details pane if clicking empty grid space
+    if (dom.layout.classList.contains('show-details') && (e.target === dom.grid || e.target === document.querySelector('.app-main'))) {
+      dom.layout.classList.remove('show-details');
     }
   });
+
+  // Explicit close buttons
+  const hideAllModals = () => {
+    // Object.values selects all modals, .forEach modal attaches toggle
+    Object.values(dom.modals).forEach(modal => toggleUI(modal, false));
+    dom.optionsMenu.classList.remove('active');
+    dom.layout.classList.remove('show-details');
+  };
+
+  document.querySelectorAll('.close-modal, #closeDetails, #closeUploadModal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideAllModals();
+    });
+  });
+
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') hideOptionsMenu();
+    if (e.key === 'Escape') hideAllModals();
   });
 
   </script>
