@@ -56,13 +56,13 @@ model File {
   folder     Folder?  @relation(fields: [folderId], references: [id])
   folderId   Int?
 
-  shares Share[] // holds shareable access tokens to file     
+  shares Share[] // holds shareable access tokens to file
 }
 
 // Share table
 model Share {
   id        String   @id @default(uuid()) // Generates shareable access token
-  file      File     @relation(fields: [fileId], references: [id])
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId    Int
   expiresAt DateTime
   createdAt DateTime @default(now())
