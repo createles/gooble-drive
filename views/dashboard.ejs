@@ -42,7 +42,7 @@
           data-type="Folder"
           data-id="<%= folder.id %>"
           data-name="<%= folder.name %>"
-          data-size="---"
+          data-size="==="
           data-date="<%= folder.createdOn.toDateString() %>">
           <button class="options-btn">&#8942;</button>
           <div class="folder-icon" style="font-size: 2rem;">📁</div>
@@ -86,7 +86,7 @@
   
   <script>
 
-    // --- DOM ELEMENTS ---
+    // === DOM ELEMENTS ===
     const dom = {
     layout: document.querySelector('.dashboard-layout'),
     grid: document.querySelector('.item-grid'),
@@ -113,13 +113,13 @@
     optionsShareBtn: document.getElementById('optionsShareBtn')
   };
 
-  // --- SET GLOBAL CURRENT ACTIVE FILE ---
+  // === SET GLOBAL CURRENT ACTIVE FILE ===
   let currentActiveFileId = null;
 
-  // --- VISIBILITY TOGGLE HELPER ---
+  // === VISIBILITY TOGGLE HELPER ===
   const toggleUI = (el, force) => el.classList.toggle('active', force);
 
-  // --- GRID ITEM BEHAVIOR ---
+  // === GRID ITEM BEHAVIOR ===
 
   // FIX: Rewrote event listeners to be a single Event Delegation listener on the parent
   // .item-grid for efficiency and brevity 
@@ -148,7 +148,7 @@
     if (destination) window.location.href = destination;
   });
 
-  // --- OPTIONS MENU LOGIC ---
+  // === OPTIONS MENU LOGIC ===
   const showOptionsMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -169,7 +169,7 @@
     btn.addEventListener('click', showOptionsMenu)
   );
 
-  // --- SHARE FEATURE (Fetch API) ---
+  // === SHARE FEATURE (Fetch API) ===
   const openShareModal = (fileId) => {
     dom.share.fileId.value = fileId;
     // toggleUI(dom.share.setup, true);
@@ -213,7 +213,10 @@
     alert("Link copied to clipboard!");
   }
 
-  // --- UPLOAD MODAL ---
+  // === DELETE FILE/FOLDER LOGIC ===
+
+
+  // === UPLOAD MODAL ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
   const tabUpload = document.getElementById('tabUpload');
   const tabFolder = document.getElementById('tabFolder');
@@ -241,7 +244,7 @@
     switchTab(tabFolder, tabUpload, formFolder, formUpload);
   });
 
-  // --- GLOBAL CLOSING LOGIC ---
+  // === GLOBAL CLOSING LOGIC ===
   window.addEventListener('click', (e) => {
     // Close modals if dark overlay is clicked
     if (e.target === dom.modals.upload) toggleUI(dom.modals.upload, false);
