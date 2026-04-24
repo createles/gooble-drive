@@ -110,7 +110,8 @@
     },
     optionsMenu: document.getElementById('optionsMenu'),
     optionsDlBtn: document.getElementById('optionsDlBtn'),
-    optionsShareBtn: document.getElementById('optionsShareBtn')
+    optionsShareBtn: document.getElementById('optionsShareBtn'),
+    optionsDeleteBtn: document.getElementById('optionsDeleteBtn')
   };
 
   // === SET GLOBAL CURRENT ACTIVE FILE ===
@@ -158,6 +159,7 @@
     // Update Menu Buttons
     dom.optionsDlBtn.href = `/download/${currentActiveFileId}`;
     dom.optionsShareBtn.dataset.id = currentActiveFileId;
+    dom.optionsDeleteBtn.dataset.id = currentActiveFileId;
 
     // Position and Show
     dom.optionsMenu.style.top = `${e.pageY}px`;
@@ -214,7 +216,31 @@
   }
 
   // === DELETE FILE/FOLDER LOGIC ===
+  dom.optionsDeleteBtn.addEventListener('click', async () => {
+    const itemId = dom.optionsDeleteBtn.dataset.id;
+    const itemType = activeItemData.type;
+    
+    const confirmDelete = confirm(`Are you sure you want to delete this ${itemType}?`);
+    if (!confirmDelete) return;
 
+    try {
+      // Determine route based on type
+      const route = itemType === 'File' ? `/files/delete/${itemId}` : `/folders/delete/${itemId}`;
+      
+      const response = await fetch(route, { method: 'DELETE' });
+      // Holds json object containing success status after calling deleteFile
+      const result = await response.json();
+
+
+      if (result.success) {
+        window.location.reload(); // Refresh to update grid
+      } else {
+        alert("Error deleting item.");
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  });
 
   // === UPLOAD MODAL ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
