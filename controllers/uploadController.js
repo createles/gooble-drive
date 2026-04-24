@@ -41,6 +41,7 @@ export const handleUpload = async (req, res) => {
     const fileName = `${Date.now()}-${file.originalname}`;
     const filePath = `user-${userId}/${fileName}`;
 
+    console.log(filePath);
     // --- Supabase Handshake ---
     const { data, error } = await supabase.storage
       .from('uploads') // Your bucket name from Phase 1
