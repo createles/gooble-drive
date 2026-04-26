@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { supabase } from "../lib/supabase.js";
 
 export const getFileMetadata = async (req, res, next) => {
   try {
@@ -22,12 +23,30 @@ export const getFileMetadata = async (req, res, next) => {
 }
 
 export const startDownload = async (req, res) => {
-  // Grab the file metadata attached by the previous function
   const file = req.fileMetadata;
 
-  // Use res.download(path, optionalName)
-  res.download(file.url, file.name); 
-}
+  try {
+    // Fetch the file directly from the Supabase bucket using its 'path', returns a Blob
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .download(file.path); // Use path key "eg. user-id/filename"
+
+    if (error) throw error;
+
+    // Convert the Blob to a Buffer and stream to user
+    const buffer = Buffer.from(await data.arrayBuffer());
+    
+    // Set headers so the browser knows it's a file download
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.name}"`);
+    res.send(buffer);
+
+  } catch (err) {
+    console.error("Download Error:", err);
+    req.flash('error', 'Could not download file.');
+    res.redirect('/dashboard');
+  }
+};
 
 export const generateShareLink = async (req, res) => {
   try {
@@ -67,7 +86,12 @@ export const deleteFile = async (req, res) => {
     
     if (!file) return res.status(404).json({ error: "File not found" });
 
-    // [FUTURE CLOUD LOGIC HERE]: call cloudinary.uploader.destroy(file.publicId)
+    // Delete from Supabase Storage first
+    const { error: storageError } = await supabase.storage
+      .from('uploads')
+      .remove([file.path]);
+
+    if (storageError) throw storageError;
 
     // 2. Delete from Database
     await prisma.file.delete({ where: { id: parseInt(fileId) } });
