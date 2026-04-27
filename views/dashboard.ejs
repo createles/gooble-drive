@@ -114,9 +114,6 @@
     optionsDeleteBtn: document.getElementById('optionsDeleteBtn')
   };
 
-  // === SET GLOBAL CURRENT ACTIVE FILE ===
-  let currentActiveFileId = null;
-
   // === VISIBILITY TOGGLE HELPER ===
   const toggleUI = (el, force) => el.classList.toggle('active', force);
 
@@ -151,15 +148,19 @@
 
   // === OPTIONS MENU LOGIC ===
   const showOptionsMenu = (e) => {
+    const item = e.target.closest('.grid-item');
+    const itemId = item.dataset.id;
+    const itemType = item.dataset.type;
+    
     e.preventDefault();
     e.stopPropagation();
-    const item = e.target.closest('.grid-item');
-    currentActiveFileId = item.dataset.id;
+
+    // Stamp ID onto options menu
+    dom.optionsMenu.dataset.activeId = itemId;
+    dom.optionsMenu.dataset.activeType = itemType;
 
     // Update Menu Buttons
-    dom.optionsDlBtn.href = `/download/${currentActiveFileId}`;
-    dom.optionsShareBtn.dataset.id = currentActiveFileId;
-    dom.optionsDeleteBtn.dataset.id = currentActiveFileId;
+    dom.optionsDlBtn.href = `/download/${itemId}`;
 
     // Position and Show
     dom.optionsMenu.style.top = `${e.pageY}px`;
@@ -181,7 +182,8 @@
 
   dom.optionsShareBtn?.addEventListener('click', () => {
     dom.optionsMenu.classList.remove('active');
-    openShareModal(currentActiveFileId);
+    const fileId = dom.optionsMenu.dataset.activeId;
+    openShareModal(fileId);
   });
 
   async function handleShareClick() {
@@ -217,15 +219,15 @@
 
   // === DELETE FILE/FOLDER LOGIC ===
   dom.optionsDeleteBtn.addEventListener('click', async () => {
-    const itemId = dom.optionsDeleteBtn.dataset.id;
-    const itemType = activeItemData.type;
+    const itemId = dom.optionsMenu.dataset.activeId;
+    const itemType = dom.optionsMenu.dataset.activeType;
     
     const confirmDelete = confirm(`Are you sure you want to delete this ${itemType}?`);
     if (!confirmDelete) return;
 
     try {
       // Determine route based on type
-      const route = itemType === 'File' ? `/files/delete/${itemId}` : `/folders/delete/${itemId}`;
+      const route = `/${itemType}s/${itemId}`;
       
       const response = await fetch(route, { method: 'DELETE' });
       // Holds json object containing success status after calling deleteFile
