@@ -77,6 +77,42 @@ export const generateShareLink = async (req, res) => {
   }
 }
 
+// === RENAME FILES/FOLDERS ===
+export const renameFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { newName } = req.body;
+
+    await prisma.file.update({
+      where: { id: parseInt(fileId) },
+      data: { name: newName }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to rename file" });
+  }
+};
+
+export const renameFolder = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+    const { newName } = req.body;
+
+    await prisma.folder.update({
+      where: { id: parseInt(folderId) },
+      data: { name: newName }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to rename folder" });
+  }
+};
+
+
+// === DELETE FILES/FOLDERS ===
+
 export const deleteFile = async (req, res) => {
   try {
     const { fileId } = req.params;
