@@ -14,6 +14,7 @@
   <%- include('partials/upload-modal.ejs') %>
   <%- include('partials/options-menu.ejs') %>
   <%- include('partials/share-modal.ejs') %>
+  <%- include('partials/move-modal.ejs') %>
 
   <!-- Main Content Area -->
   <main class="app-main">
@@ -93,7 +94,8 @@
     modals: {
       upload: document.getElementById('uploadModal'),
       details: document.getElementById('detailsModal'),
-      share: document.getElementById('shareModal')
+      share: document.getElementById('shareModal'),
+      move: document.getElementById('moveModal')
     },
     details: {
       name: document.getElementById('detailName'),
@@ -278,6 +280,59 @@
       console.error("Delete failed:", err);
     }
   });
+
+
+  // === MOVE FILE/FOLDER LOGIC ===
+  const moveForm = document.getElementById('moveForm');
+  const folderSelect = document.getElementById('folderSelect');
+
+  dom.options.move.addEventListener('click', async () => {
+    const id = dom.options.menu.dataset.actived;
+    const type = dom.options.menu.dataset.activeType;
+
+    const response = await fetch('/folders');
+    const folders = await response.json();
+
+    // 'Reset'/'Clear' options except root folder
+    folderSelect.innerHTML = '<option value="root">Dashboard (Root)</option>';
+
+    // Display possible folder destinations
+    folders.forEach(folder => {
+      // Skip listing itself if moving a folder
+      if (type === 'folder' && folder.id === id) return;
+
+      const option = document.createElement('option');
+      option.value = folder.id;
+      option.textContent = folder.name;
+      folderSelect.appendChild(option);
+    });
+
+    document.getElementById('moveItemType').textContent = type;
+    dom.modals.move.classList.add('active');
+  });
+
+
+  // Submitting destination folder for Move
+  moveForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = dom.options.menu.dataset.activeId;
+    const type = dom.options.menu.dataset.activeType;
+    const destinationId = folderSelect.value;
+
+    const response = await fetch (`/${type}s/${id}/move`, {
+      method: 'PATCH',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify({ destinationId })
+    });
+
+    if (response.ok) {
+      window.location.reload();
+    } else {
+      const err = await response.json();
+      alert(err.error || 'Move failed.');
+    }
+  });
+
 
   // === UPLOAD MODAL ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
