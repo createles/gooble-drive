@@ -188,3 +188,96 @@ export const deleteFolder = async (req, res) => {
     res.status(500).json({ error: "Failed to delete folder tree." });
   }
 };
+
+
+// === MOVE FILES/FOLDER ===
+
+// Fetch all folders for the dropdown
+export const getUserFolders = async (req, res) => {
+  try {
+    const folders = await prisma.folder.findMany({
+      where: { userId: req.user.id },
+      select: { id: true, name: true }
+    });
+    res.json(folders);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch folders" });
+  }
+};
+
+// Circularity check to prevent illegal moves (eg. moves into a nested sub-folder)
+const isDescendant = async (potentialParentId, folderId) => {
+  // Destination being Root (null) is always safe
+  if (!folderId) return false;
+
+  // Fetch the folder we are trying to move INTO
+  const currentFolder = await prisma.folder.findUnique({
+    where: { id: folderId },
+    select: { parentId: true }
+  });
+
+  // If this folder's parent is the folder we are moving, return true
+  if (currentFolder.parentId === potentialParentId) return true;
+
+  // Keep climbing up the tree until we hit the root, recursively call function
+  if (currentFolder.parentId !== null) {
+    return await isDescendant(potentialParentId, currentFolder.parentId);
+  }
+
+  // Hit the root folder without illegal moves, move is SAFE
+  return false;
+};
+
+// Move Folder Logic
+export const moveFolder = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+    let { destinationId } = req.body;
+    
+    // targetId = folder to be moved
+    const targetId = parseInt(folderId);
+    const destId = destinationId === 'root' ? null : parseInt(destinationId);
+
+    // Guardrail: Prevent moving into self/current folder
+    if (targetId === destId) {
+      return res.status(400).json({ error: "Cannot move a folder into itself" });
+    }
+
+    // Guardrail 2: Prevent moving into descendant
+    const isIllegal = await isDescendant(targetId, destId);
+    if (isIllegal) {
+      return res.status(400).json({
+        error: "Illegal Move: You cannot move a folder into one of its own sub-folders."
+      })
+    }
+
+    await prisma.folder.update({
+      where: { id: targetId },
+      data: { parentId: destId }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to move folder" });
+  }
+};
+
+
+// Move File Logic
+export const moveFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { destinationId } = req.body;
+    
+    const destId = destinationId === 'root' ? null : parseInt(destinationId);
+
+    await prisma.file.update({
+      where: { id: parseInt(fileId) },
+      data: { folderId: destId }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to move file" });
+  }
+};
