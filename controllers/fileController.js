@@ -102,3 +102,53 @@ export const deleteFile = async (req, res) => {
     res.status(500).json({ error: "Failed to delete file" });
   }
 };
+
+
+// Recursive helper to find ALL nested file paths
+const getAllNestedFilePaths = async (folderId) => {
+  let paths = [];
+
+  // Get all files in CURRENT folder
+  const files = await prisma.file.findMany({
+    where: { folderId: parseInt(folderId) },
+    select: { path: true }
+  });
+  paths.push(...files.map(f => f.path));
+
+  // Get all sub-folders in located in CURRENT folder
+  const subFolders = await prisma.folder.findMany({
+    where: { parentId: parseInt(folderId) },
+    select: { id: true }
+  });
+
+  /// Recursively call this function for each sub-folder
+  for (const folder of subFolders) {
+    const nestedPaths = await getAllNestedFilePaths(folder.id);
+    paths.push(...nestedPaths);
+  }
+
+  return paths;
+};
+
+
+export const deleteFolder = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+
+    // Use recursive helper to find all files to be deleted
+    const allPaths = await getAllNestedFilePaths(folderId);
+
+    // If we found any files, delete them from Supabase in one go
+    if (allPaths.length > 0) {
+      await supabase.storage.from('uploads').remove(allPaths);
+    }
+
+    // Prisma wipes folders from database w/ help from OnCascade
+    await prisma.folder.delete({ where: { id: parseInt(folderId) } });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Deep Delete Error:", err);
+    res.status(500).json({ error: "Failed to delete folder tree." });
+  }
+};
