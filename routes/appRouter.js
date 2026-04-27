@@ -4,7 +4,7 @@ import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated
 import { getDashboard, postCreateFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
-import { deleteFile, deleteFolder, generateShareLink, getFileMetadata, startDownload } from "../controllers/fileController.js";
+import { deleteFile, deleteFolder, generateShareLink, getFileMetadata, renameFile, renameFolder, startDownload } from "../controllers/fileController.js";
 
 const appRouter = Router();
 
@@ -27,7 +27,10 @@ appRouter.post('/folders/create', isAuth, postCreateFolder);
 // Route for Fetch API call to get shareable link
 appRouter.post('/files/share', isAuth, generateShareLink);
 
-appRouter.delete('/files/:fileId', isAuth, deleteFile);
-appRouter.delete('/folders/:folderId', isAuth, deleteFolder);
+appRouter.delete('/files/:fileId/delete', isAuth, deleteFile);
+appRouter.delete('/folders/:folderId/delete', isAuth, deleteFolder);
+
+appRouter.patch('/files/:fileId/rename', isAuth, renameFile);
+appRouter.patch('/folders/:folderId/rename', isAuth, renameFolder);
 
 export default appRouter;
