@@ -39,7 +39,7 @@
         <% folders.forEach(folder => { %>
         <a href="/dashboard/<%= folder.id %>" 
           class="grid-item"
-          data-type="Folder"
+          data-type="folder"
           data-id="<%= folder.id %>"
           data-name="<%= folder.name %>"
           data-size="==="
@@ -53,7 +53,7 @@
       <!-- Loop over files -->
       <% files.forEach(file => { %>
         <div class="grid-item"
-          data-type="File"
+          data-type="file"
           data-id="<%= file.id %>" 
           data-name="<%= file.name %>" 
           data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
@@ -108,10 +108,15 @@
       duration: document.getElementById('shareDuration'),
       linkInput: document.getElementById('generatedLink')
     },
-    optionsMenu: document.getElementById('optionsMenu'),
-    optionsDlBtn: document.getElementById('optionsDlBtn'),
-    optionsShareBtn: document.getElementById('optionsShareBtn'),
-    optionsDeleteBtn: document.getElementById('optionsDeleteBtn')
+    options: {
+      menu: document.getElementById('optionsMenu'),
+      download: document.getElementById('optionsDlBtn'),
+      share: document.getElementById('optionsShareBtn'),
+      delete: document.getElementById('optionsDeleteBtn'),
+      rename: document.getElementById('optionsRenameBtn'),
+      copy: document.getElementById('optionsCopyBtn'),
+      move: document.getElementById('optionsMoveBtn'),
+    },
   };
 
   // === VISIBILITY TOGGLE HELPER ===
@@ -156,16 +161,16 @@
     e.stopPropagation();
 
     // Stamp ID onto options menu
-    dom.optionsMenu.dataset.activeId = itemId;
-    dom.optionsMenu.dataset.activeType = itemType;
+    dom.options.menu.dataset.activeId = itemId;
+    dom.options.menu.dataset.activeType = itemType;
 
     // Update Menu Buttons
-    dom.optionsDlBtn.href = `/download/${itemId}`;
+    dom.options.download.href = `/download/${itemId}`;
 
     // Position and Show
-    dom.optionsMenu.style.top = `${e.pageY}px`;
-    dom.optionsMenu.style.left = `${e.pageX}px`;
-    toggleUI(dom.optionsMenu, true);
+    dom.options.menu.style.top = `${e.pageY}px`;
+    dom.options.menu.style.left = `${e.pageX}px`;
+    toggleUI(dom.options.menu, true);
   };
 
   document.querySelectorAll('.options-btn').forEach(btn => 
@@ -180,9 +185,9 @@
     toggleUI(dom.modals.share, true);
   };
 
-  dom.optionsShareBtn?.addEventListener('click', () => {
-    dom.optionsMenu.classList.remove('active');
-    const fileId = dom.optionsMenu.dataset.activeId;
+  dom.options.share?.addEventListener('click', () => {
+    dom.options.menu.classList.remove('active');
+    const fileId = dom.options.menu.dataset.activeId;
     openShareModal(fileId);
   });
 
@@ -217,17 +222,47 @@
     alert("Link copied to clipboard!");
   }
 
+
+  // === RENAME FILE/FOLDER LOGIC ===
+  dom.options.rename.addEventListener('click', async () => {
+    const id = dom.options.menu.dataset.activeId;
+    const type = dom.options.menu.dataset.activeType;
+    
+    // Quick way to get the existing name from the dashboard UI
+    const itemElement = document.querySelector(`.grid-item[data-id="${id}"][data-type="${type}"]`);
+    
+    if (!itemElement) return console.error("Could not find element to rename");
+    
+    const oldName = itemElement.querySelector('.item-name').innerText;
+    const newName = prompt(`Enter new name for this ${type}:`, oldName);
+
+    if (newName && newName !== oldName) {
+      const response = await fetch(`/${type}s/${id}/rename`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newName })
+      });
+
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert(`Could not rename ${type}. Please try again.`);
+      }
+    }
+  });
+
+
   // === DELETE FILE/FOLDER LOGIC ===
-  dom.optionsDeleteBtn.addEventListener('click', async () => {
-    const itemId = dom.optionsMenu.dataset.activeId;
-    const itemType = dom.optionsMenu.dataset.activeType;
+  dom.options.delete.addEventListener('click', async () => {
+    const itemId = dom.options.menu.dataset.activeId;
+    const itemType = dom.options.menu.dataset.activeType;
     
     const confirmDelete = confirm(`Are you sure you want to delete this ${itemType}?`);
     if (!confirmDelete) return;
 
     try {
       // Determine route based on type
-      const route = `/${itemType}s/${itemId}`;
+      const route = `/${itemType}s/${itemId}/delete`;
       
       const response = await fetch(route, { method: 'DELETE' });
       // Holds json object containing success status after calling deleteFile
@@ -279,8 +314,8 @@
     if (e.target === dom.modals.share) toggleUI(dom.modals.share, false);
 
     // Close options menu if clicking outside
-    if (dom.optionsMenu.classList.contains('active') && !dom.optionsMenu.contains(e.target)) {
-      dom.optionsMenu.classList.remove('active');
+    if (dom.options.menu.classList.contains('active') && !dom.options.menu.contains(e.target)) {
+      dom.options.menu.classList.remove('active');
     }
 
     // Close details pane if clicking empty grid space
@@ -293,7 +328,7 @@
   const hideAllModals = () => {
     // Object.values selects all modals, .forEach modal attaches toggle
     Object.values(dom.modals).forEach(modal => toggleUI(modal, false));
-    dom.optionsMenu.classList.remove('active');
+    dom.options.menu.classList.remove('active');
     dom.layout.classList.remove('show-details');
   };
 
