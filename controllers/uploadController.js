@@ -21,7 +21,12 @@ if (!fs.existsSync(uploadDir)) {
 // === Memory Storage Configuration ===
 
 const storage = multer.memoryStorage();
-export const upload = multer({ storage });
+export const upload = multer({ 
+  storage,
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10 * 1024 * 1024 bytes
+  }
+});
 
 export const handleUpload = async (req, res) => {
   // Capture current folder context for the redirect logic
@@ -31,6 +36,12 @@ export const handleUpload = async (req, res) => {
 
   if (!file) {
     req.flash('error', 'No file selected.');
+    return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
+  }
+
+  const allowFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
+  if (!allowedTypes.includes(file.mimetype)) {
+    req.flash("error", "Invalid file type. Only JPG, PNG, PDF, and TXT files are allowed.")
     return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
   }
 
