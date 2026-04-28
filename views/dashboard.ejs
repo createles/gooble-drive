@@ -127,9 +127,6 @@
   const toggleUI = (el, force) => el.classList.toggle('active', force);
 
   // === GRID ITEM BEHAVIOR ===
-
-  // FIX: Rewrote event listeners to be a single Event Delegation listener on the parent
-  // .item-grid for efficiency and brevity 
   dom.grid?.addEventListener('click', (e) => {
     const item = e.target.closest('.grid-item');
     if (!item || e.target.closest('.options-btn')) return;
@@ -291,6 +288,7 @@
   const folderSelect = document.getElementById('folderSelect');
 
   dom.options.move.addEventListener('click', async () => {
+    dom.options.menu.classList.remove('active');
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
     const name = dom.options.menu.dataset.activeName;
@@ -415,6 +413,7 @@
     // Close modals if dark overlay is clicked
     if (e.target === dom.modals.upload) toggleUI(dom.modals.upload, false);
     if (e.target === dom.modals.share) toggleUI(dom.modals.share, false);
+    if (e.target === dom.modals.move) toggleUI(dom.modals.move, false);
 
     // Close options menu if clicking outside
     if (dom.options.menu.classList.contains('active') && !dom.options.menu.contains(e.target)) {
@@ -435,7 +434,7 @@
     dom.layout.classList.remove('show-details');
   };
 
-  document.querySelectorAll('.close-modal, #closeDetails, #closeUploadModal').forEach(btn => {
+  document.querySelectorAll('.close-modal, #closeDetails, #closeUploadModal, #closeMoveModal, #closeShareModal').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideAllModals();
