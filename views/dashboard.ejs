@@ -99,6 +99,9 @@
       share: document.getElementById('shareModal'),
       move: document.getElementById('moveModal')
     },
+    upload: {
+      fileInput: document.getElementById('file'),
+    },
     details: {
       name: document.getElementById('detailName'),
       type: document.getElementById('detailType'),
@@ -425,6 +428,14 @@
   document.getElementById('openUploadModal')?.addEventListener('click', openUploadModal);
   document.querySelector('.empty-upload-btn')?.addEventListener('click', openUploadModal);
 
+  // Add alert for file sizes larger than 10MB
+  dom.upload.fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 10 * 1024 * 1024 ) {
+      alert('This file is too large to upload (Max 10MB).');
+      e.target.value = ""; // Clear the upload input
+    }
+  });
 
   // Tab Switching Helper
   const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
