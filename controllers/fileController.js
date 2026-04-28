@@ -192,14 +192,50 @@ export const deleteFolder = async (req, res) => {
 
 // === MOVE FILES/FOLDER ===
 
-// Fetch all folders for the dropdown
+// Determines illegal folders to move to
+const getDescendantFolderIds = async (folderId) => {
+  let ids = [parseInt(folderId)]; // Includes the folder itself
+
+  const subFolders = await prisma.folder.findMany({
+    where: { parentId: parseInt(folderId) },
+    select: { id: true }
+  });
+
+  for (const folder of subFolders) {
+    const nestedIds = await getDescendantFolderIds(folder.id);
+    ids.push(...nestedIds);
+  }
+
+  // List of illegal folder ids
+  return ids;
+};
+
+
+// Fetch all possible destination folders for the dropdown
 export const getUserFolders = async (req, res) => {
   try {
-    const folders = await prisma.folder.findMany({
+    const { movingId, type } = req.query;
+
+    // First, get all folders belonging to the user
+    const allFolders = await prisma.folder.findMany({
       where: { userId: req.user.id },
       select: { id: true, name: true }
     });
-    res.json(folders);
+
+    // Identify illegal folders to move to
+    let illegalIds = [];
+    if (type === 'folder' && movingId) {
+      illegalIds = await getDescendantFolderIds(movingId);
+    }
+
+    // Map folders and add 'isInvalid' flag
+    const folderList = allFolders.map(folder => ({
+      ...folder,
+      isInvalid: illegalIds.includes(folder.id)
+    }));
+
+    // Return folders including isInvalid flag
+    res.json(folderList);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch folders" });
   }

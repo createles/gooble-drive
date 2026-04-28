@@ -287,10 +287,11 @@
   const folderSelect = document.getElementById('folderSelect');
 
   dom.options.move.addEventListener('click', async () => {
-    const id = dom.options.menu.dataset.actived;
+    const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
 
-    const response = await fetch('/folders');
+    // Pass active info to the server
+    const response = await fetch(`/folders?movingId=${id}&type=${type}`);
     const folders = await response.json();
 
     // 'Reset'/'Clear' options except root folder
@@ -298,12 +299,21 @@
 
     // Display possible folder destinations
     folders.forEach(folder => {
-      // Skip listing itself if moving a folder
-      if (type === 'folder' && folder.id === id) return;
-
       const option = document.createElement('option');
       option.value = folder.id;
       option.textContent = folder.name;
+
+      if (folder.isInvalid) {
+        option.disabled = true;
+        if (folder.id === parseInt(id)) {
+          option.textContent += ' (cannot move into self)';
+        } else {
+          option.textContent += ' (cannot move into sub-nested folder)';
+        }
+
+        option.style.color = '#999'; // visual grey out
+      }
+
       folderSelect.appendChild(option);
     });
 
