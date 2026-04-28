@@ -5,6 +5,7 @@ import { getDashboard, postCreateFolder } from "../controllers/dashboardControll
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
 import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload } from "../controllers/fileController.js";
+import multer from "multer";
 
 const appRouter = Router();
 
@@ -19,7 +20,25 @@ appRouter.use('/', userRouter);
 appRouter.use('/dashboard', dashboardRouter);
 
 
-appRouter.use('/upload', isAuth, upload.single('file'), handleUpload);
+appRouter.post('/upload', isAuth, (req, res, next) => {
+  // Capture any errors from upload.single(), pass to a middleware fn
+  upload.single('file')(req, res, (err) => { 
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        req.flash("error", "File is too large! Max limit is 5MB.");
+        return res.redirect(req.body.folderId ? `/dashboard/${req.body.folderId}` : "/dashboard");
+      }
+      req.flash("error", `Upload Error: ${err.message}`);
+      return res.redirect("/dashboard");
+    } else if (err) {
+      return next(err);
+    }
+    // If no multer error, proceed to the controller
+    next();
+  });
+}, handleUpload);
+
+
 appRouter.get('/download/:fileId', getFileMetadata, startDownload);
 
 appRouter.post('/folders/create', isAuth, postCreateFolder);
