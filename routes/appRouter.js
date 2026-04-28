@@ -4,7 +4,7 @@ import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated
 import { getDashboard, postCreateFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
-import { deleteFile, deleteFolder, generateShareLink, getFileMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload } from "../controllers/fileController.js";
+import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload } from "../controllers/fileController.js";
 
 const appRouter = Router();
 
@@ -39,5 +39,8 @@ appRouter.patch('/folders/:folderId/rename', isAuth, renameFolder);
 appRouter.get('/folders', isAuth, getUserFolders);
 appRouter.patch('/files/:fileId/move', isAuth, moveFile);
 appRouter.patch('/folders/:folderId/move', isAuth, moveFolder);
+
+// Copy Routes
+appRouter.post('/files/:fileId/copy', isAuth, copyFile)
 
 export default appRouter;

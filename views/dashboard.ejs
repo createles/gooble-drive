@@ -391,6 +391,31 @@
   });
 
 
+  // === COPY FILES LOGIC ===
+  dom.options.copy.addEventListener('click', async () => {
+    const id = dom.options.menu.dataset.activeId;
+    if (!id) return;
+
+    try {
+      const response = await fetch(`/files/${id}/copy`, {
+        method: 'POST',
+        header: { 'Content-Type' : 'application/json' }
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert(result.error || "Failed to copy file.");
+      }
+    } catch (err) {
+      console.error("Error copying file:", err);
+    } finally {
+      toggleUI(dom.options.menu, false);
+    }
+  })
+
   // === UPLOAD MODAL ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
   const tabUpload = document.getElementById('tabUpload');

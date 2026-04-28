@@ -317,3 +317,49 @@ export const moveFile = async (req, res) => {
     res.status(500).json({ error: "Failed to move file" });
   }
 };
+
+
+//  === COPY FILES ===
+export const copyFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+
+    // Fetch the original file metadata
+    const originalFile = await prisma.file.findUnique({
+      where: { id: parseInt(fileId) }
+    });
+
+    if (!originalFile) return res.status(404).json({ error: "File not found" });
+
+    // Generate new unique path and name for Copy
+    // Pattern: "original-path-copy-timestamp" to ensure Supabase uniqueness
+    const timestamp = Date.now();
+    const newPath = `${originalFile.path}-copy-${timestamp}`;
+    const newName = `${originalFile.name} (Copy)`;
+
+    // Supabase handles Server-side Copy
+    const { error: storageError } = await supabase.storage
+      .from('uploads')
+      .copy(originalFile.path, newPath);
+
+    if (storageError) throw storageError;
+
+    // Create the new Database record
+    // Omit 'id' so Prisma generates a new one, and reset 'uploadTime' to now
+    await prisma.file.create({
+      data: {
+        name: newName,
+        url: originalFile.url.replace(originalFile.path, newPath), // Update URL if it contains the path, skips api call
+        path: newPath,
+        size: originalFile.size,
+        userId: originalFile.userId,
+        folderId: originalFile.folderId,
+      }
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Copy Error:", err);
+    res.status(500).json({ error: "Failed to duplicate file." });
+  }
+};
