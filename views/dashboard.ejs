@@ -114,6 +114,7 @@
     },
     options: {
       menu: document.getElementById('optionsMenu'),
+      details: document.getElementById('optionsDetailsBtn'),
       download: document.getElementById('optionsDlBtn'),
       share: document.getElementById('optionsShareBtn'),
       delete: document.getElementById('optionsDeleteBtn'),
@@ -127,21 +128,23 @@
   const toggleUI = (el, force) => el.classList.toggle('active', force);
 
   // === GRID ITEM BEHAVIOR ===
-  dom.grid?.addEventListener('click', (e) => {
-    const item = e.target.closest('.grid-item');
-    if (!item || e.target.closest('.options-btn')) return;
 
-    // FIX: "Stop" navigation on single click for folders
-    if (item.tagName === 'A') e.preventDefault();
-
+  const syncDetailsPane = (item) => {
     // Populate Details Pane
     dom.details.name.textContent = item.dataset.name;
     dom.details.type.textContent = item.dataset.type;
     dom.details.size.textContent = item.dataset.size;
     dom.details.date.textContent = item.dataset.date;
+  }
 
-    // Trigger Slide-out Layout
-    dom.layout.classList.add('show-details');
+  dom.grid?.addEventListener('click', (e) => {
+    const item = e.target.closest('.grid-item');
+    if (!item) return;
+
+    // FIX: "Stop" navigation on single click for folders
+    if (item.tagName === 'A') e.preventDefault();
+
+    syncDetailsPane(item);
   });
 
   // Double click allows navigating into a folder
@@ -159,6 +162,8 @@
     const itemType = item.dataset.type;
     const itemName = item.dataset.name;
     
+    syncDetailsPane(item);
+
     e.preventDefault();
     e.stopPropagation();
 
@@ -179,6 +184,12 @@
   document.querySelectorAll('.options-btn').forEach(btn => 
     btn.addEventListener('click', showOptionsMenu)
   );
+
+  // === VIEW DETAILS ===
+  dom.options.details.addEventListener('click', () => {
+    dom.layout.classList.add('show-details');
+    toggleUI(dom.options.menu, false);
+  })
 
   // === SHARE FEATURE (Fetch API) ===
   const openShareModal = (fileId) => {
