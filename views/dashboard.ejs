@@ -35,7 +35,9 @@
     <!-- Conditional Rendering based on database contents -->
     <% if ((locals.folders && folders.length > 0) || (locals.files && files.length > 0)) { %>
       
-      <div class="item-grid">
+      <div 
+      class="item-grid"
+      data-current-folder-id="<%= currentFolder ? currentFolder.id : 'root' %>">
         <!-- Loop over folders -->
         <% folders.forEach(folder => { %>
         <a href="/dashboard/<%= folder.id %>" 
@@ -158,6 +160,7 @@
     const item = e.target.closest('.grid-item');
     const itemId = item.dataset.id;
     const itemType = item.dataset.type;
+    const itemName = item.dataset.name;
     
     e.preventDefault();
     e.stopPropagation();
@@ -165,6 +168,7 @@
     // Stamp ID onto options menu
     dom.options.menu.dataset.activeId = itemId;
     dom.options.menu.dataset.activeType = itemType;
+    dom.options.menu.dataset.activeName = itemName;
 
     // Update Menu Buttons
     dom.options.download.href = `/download/${itemId}`;
@@ -289,14 +293,29 @@
   dom.options.move.addEventListener('click', async () => {
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
+    const name = dom.options.menu.dataset.activeName;
+    const currentViewFolder = document.querySelector('.item-grid').dataset.currentFolderId;
+    const moveFolderName = document.getElementById('moveFolderName');
+    const moveFileName = document.getElementById('moveFileName');
 
     // Pass active info to the server
     const response = await fetch(`/folders?movingId=${id}&type=${type}`);
     const folders = await response.json();
 
     // 'Reset'/'Clear' options except root folder
-    folderSelect.innerHTML = '<option value="root">Dashboard (Root)</option>';
+    folderSelect.innerHTML = `
+    <option value="" disabled selected>— Select Destination —</option>
+    <option value="root" id="moveRoot">Dashboard (Root)</option>
+    `;
+    const rootOption = document.getElementById('moveRoot');
 
+    // PRE-CHECK: If we are already at the root, disable the Root option
+    if (currentViewFolder === 'root') {
+      rootOption.disabled = true;
+      rootOption.textContent += ' (current location)';
+      rootOption.style.color = '#999';
+    }
+    
     // Display possible folder destinations
     folders.forEach(folder => {
       const option = document.createElement('option');
@@ -312,12 +331,25 @@
         }
 
         option.style.color = '#999'; // visual grey out
+
+      // If current location folder, already in folder
+      } else if (folder.id == currentViewFolder) {
+        option.disabled = true;
+        option.textContent += ' (current location)';
+        option.style.color = '#999';
       }
 
       folderSelect.appendChild(option);
     });
 
     document.getElementById('moveItemType').textContent = type;
+    if (type === 'folder') {
+      moveFolderName.style.display = 'block';
+      moveFolderName.textContent += `${name}`;
+    } else {
+      moveFileName.style.display = 'block';
+      moveFileName.textContent += `${name}`;
+    }
     dom.modals.move.classList.add('active');
   });
 
@@ -328,6 +360,12 @@
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
     const destinationId = folderSelect.value;
+
+    // Guard against immediate submission; if value is empty, no destination folder selected
+    if (!destinationId) {
+      alert("Please select a destination folder.");
+      return;
+    }
 
     const response = await fetch (`/${type}s/${id}/move`, {
       method: 'PATCH',
