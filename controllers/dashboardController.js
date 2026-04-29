@@ -70,3 +70,22 @@ export const postCreateFolder = async (req, res, next) => {
     res.redirect(redirectUrl);
   }
 }
+
+
+// Renders Shared Item Page
+export const getSharedItemPage = async (req, res) => {
+  const { sharedData } = req.sharedData; // Set by middleware
+
+  if (!sharedData) {
+    return res.status(404).render('public-error', { 
+      message: "Shared item not found or link has expired." 
+    });
+  }
+
+  res.render('shared-item', {
+    title: `Shared: ${sharedData.file ? sharedData.file.name : sharedData.folder.name}`,  
+    sharedItem: sharedData.file || sharedData.folder,
+    user: req.user || null // Pass user info if logged in, else null
+  });
+}
+

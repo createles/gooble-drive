@@ -1,10 +1,10 @@
 import { Router } from "express";
 import userRouter from "./userRouter.js";
 import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated import path
-import { getDashboard, postCreateFolder } from "../controllers/dashboardController.js";
+import { getDashboard, getSharedItemPage, postCreateFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
-import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload } from "../controllers/fileController.js";
+import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getSharedItemMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload, validatePublicShare } from "../controllers/fileController.js";
 import multer from "multer";
 
 const appRouter = Router();
@@ -61,5 +61,10 @@ appRouter.patch('/folders/:folderId/move', isAuth, moveFolder);
 
 // Copy Routes
 appRouter.post('/files/:fileId/copy', isAuth, copyFile)
+
+// Public Routes
+appRouter.get('/share/:shareId', getSharedItemMetadata, getSharedItemPage);
+appRouter.get('/public/download/:shareId', getSharedItemMetadata, startDownload);
+appRouter.get('/public/download/:shareId', validatePublicShare, startDownload);
 
 export default appRouter;
