@@ -39,6 +39,7 @@ export const getDashboard = async (req, res) => {
       currentFolder, // Useful for breadcrumbs
       folders,
       files,
+      isPublic: false
     });
 
   } catch (err) {
@@ -74,7 +75,7 @@ export const postCreateFolder = async (req, res, next) => {
 
 // Renders Shared Item Page
 export const getSharedItemPage = async (req, res) => {
-  const { sharedData } = req.sharedData; // Set by middleware
+  const sharedData = req.sharedData; // Set by middleware
 
   if (!sharedData) {
     return res.status(404).render('public-error', { 
@@ -84,7 +85,7 @@ export const getSharedItemPage = async (req, res) => {
 
   res.render('shared-item', {
     title: `Shared: ${sharedData.file ? sharedData.file.name : sharedData.folder.name}`,  
-    sharedItem: sharedData.file || sharedData.folder,
+    sharedData: sharedData,
     user: req.user || null // Pass user info if logged in, else null
   });
 }
