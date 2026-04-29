@@ -50,23 +50,39 @@ export const startDownload = async (req, res) => {
 
 export const generateShareLink = async (req, res) => {
   try {
-    const { fileId, duration } = req.body; // Grab from a fetch request
+    const { itemId, itemType, duration } = req.body; // Grab from a fetch request
     
     // Calculate expiration date object
     // in milliseconds (e.g., 1 day = 86400000)
     const expiresAt = new Date(Date.now() + parseInt(duration));
+  
+    if (itemType === 'file') {
+      // Verify file exists and belongs to user
+      const file = await prisma.file.findFirst({
+        where: { id: parseInt(itemId), userId: req.user.id }
+      });
+      if (!file) return res.status(404).json({ error: "File not found" });
+      
+    } else if (itemType === 'folder') {
+      // Verify folder exists and belongs to user
+      const folder = await prisma.folder.findFirst({
+        where: { id: parseInt(itemId), userId: req.user.id }
+      });
+      if (!folder) return res.status(404).json({ error: "Folder not found" });
+    }
 
     // Create the share record
-    const sharedFile = await prisma.share.create({
+    const sharedItem = await prisma.share.create({
       data: {
-        fileId: parseInt(fileId),
+        fileId: parseInt(itemType === 'file' ? itemId : null), // Only set fileId if it's a file
+        folderId: parseInt(itemType === 'folder' ? itemId : null), // Only set folderId if it's a folder
         expiresAt: expiresAt
       }
     });
 
-    // Send the UUID (sharedFile.id) back to the client
+    // Send the UUID (sharedItem.id) back to the client
     // Use req.get('host') to build a full URL automatically
-    const fullUrl = `${req.protocol}://${req.get('host')}/share/${sharedFile.id}`;
+    const fullUrl = `${req.protocol}://${req.get('host')}/share/${sharedItem.id}`;
     
     // Return json with shareLink
     return res.json({ shareLink: fullUrl });
