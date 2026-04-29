@@ -66,7 +66,7 @@ export const postCreateFolder = async (req, res, next) => {
   } catch (err) {
     console.error("Folder creation error:", err);
 
-    const redirectUrl = parentid ? `/dashboard/${parentId}` : '/dashboard';
+    const redirectUrl = parentId ? `/dashboard/${parentId}` : '/dashboard';
     res.redirect(redirectUrl);
   }
 }

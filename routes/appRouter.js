@@ -25,7 +25,7 @@ appRouter.post('/upload', isAuth, (req, res, next) => {
   upload.single('file')(req, res, (err) => { 
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
-        req.flash("error", "File is too large! Max limit is 5MB.");
+        req.flash("error", "File is too large! Max limit is 10MB.");
         return res.redirect(req.body.folderId ? `/dashboard/${req.body.folderId}` : "/dashboard");
       }
       req.flash("error", `Upload Error: ${err.message}`);
