@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dashboard-layout public-view">
+
+  <%- include('partials/header', { isPublic: true }) %>
+
+  <main class="app-main public-main">
+    
+    <div class="breadcrumbs">
+      <span class="breadcrumb-link">Shared Content</span>
+      <span class="breadcrumb-separator">></span>
+      <span class="breadcrumb-current">
+        <%= sharedData.file ? sharedData.file.name : sharedData.folder.name %>
+      </span>
+    </div>
+
+    <div class="item-grid">
+      <% if (sharedData.file) { %>
+        <div class="grid-item file-item">
+          <div class="item-icon file-icon">📄</div>
+          <div class="item-info">
+            <span class="item-name"><%= sharedData.file.name %></span>
+            <span class="item-meta"><%= (sharedData.file.size / 1024).toFixed(1) %> KB</span>
+          </div>
+          <a href="/public/download/<%= sharedData.id %>" class="btn-download-public">
+            Download
+          </a>
+        </div>
+
+      <% } else if (sharedData.folder) { %>
+        <% sharedData.contents.folders.forEach(folder => { %>
+          <div class="grid-item folder-item read-only">
+            <div class="item-icon">📁</div>
+            <div class="item-info">
+              <span class="item-name"><%= folder.name %></span>
+            </div>
+            </div>
+        <% }) %>
+
+        <% sharedData.contents.files.forEach(file => { %>
+          <div class="grid-item file-item">
+            <div class="item-icon">📄</div>
+            <div class="item-info">
+              <span class="item-name"><%= file.name %></span>
+              <span class="item-meta"><%= (file.size / 1024).toFixed(1) %> KB</span>
+            </div>
+            <a href="/public/download/<%= sharedData.id %>?fileId=<%= file.id %>" class="btn-download-public">
+               Download
+            </a>
+          </div>
+        <% }) %>
+
+      <% } %>
+    </div>
+
+    <% if (sharedData.folder && sharedData.contents.folders.length === 0 && sharedData.contents.files.length === 0) { %>
+      <div class="empty-state">
+        <p>This shared folder is empty.</p>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>
