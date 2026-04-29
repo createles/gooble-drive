@@ -39,8 +39,8 @@ export const handleUpload = async (req, res) => {
     return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
   }
 
-  const allowFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
-  if (!allowedTypes.includes(file.mimetype)) {
+  const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
+  if (!allowedFileTypes.includes(file.mimetype)) {
     req.flash("error", "Invalid file type. Only JPG, PNG, PDF, and TXT files are allowed.")
     return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
   }
