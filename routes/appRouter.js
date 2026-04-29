@@ -64,7 +64,6 @@ appRouter.post('/files/:fileId/copy', isAuth, copyFile)
 
 // Public Routes
 appRouter.get('/share/:shareId', getSharedItemMetadata, getSharedItemPage);
-appRouter.get('/public/download/:shareId', getSharedItemMetadata, startDownload);
 appRouter.get('/public/download/:shareId', validatePublicShare, startDownload);
 
 export default appRouter;
