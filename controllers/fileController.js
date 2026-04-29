@@ -382,7 +382,7 @@ export const copyFile = async (req, res) => {
 
 
 // === DISPLAY SHARED ITEM METADATA (for both files and folders) ===
-export const getSharedItemMetadata = async (req, res) => {
+export const getSharedItemMetadata = async (req, res, next) => {
   try {
     const { shareId } = req.params; // This is the UUID from the share link
 
