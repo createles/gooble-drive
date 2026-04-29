@@ -379,3 +379,92 @@ export const copyFile = async (req, res) => {
     res.status(500).json({ error: "Failed to duplicate file." });
   }
 };
+
+
+// === DISPLAY SHARED ITEM METADATA (for both files and folders) ===
+export const getSharedItemMetadata = async (req, res) => {
+  try {
+    const { shareId } = req.params; // This is the UUID from the share link
+
+    // Fetch the share record and include related file or folder metadata
+    const shareRecord = await prisma.share.findUnique({
+      where: { id: shareId },
+      include: {
+        file: true, // Include file metadata if it's a file share
+        folder: true, // Include folder metadata if it's a folder share
+      }
+    });
+
+    if (!shareRecord) {
+      return res.status(404).render('public-error', { message: "Shared item not found." });
+    }
+
+    if (new Date() > shareRecord.expiresAt) {
+      return res.status(403).render('public-error', { message: "This share link has expired." });
+    }
+
+    // If sharing a folder, fetch immediate contents (files and sub-folders)
+    if (shareRecord.folder) {
+      const folderId = shareRecord.folder.id;
+      shareRecord.contents = {
+        folders: await prisma.folder.findMany({ where: { parentId: folderId } }),
+        files: await prisma.file.findMany({ where: { folderId: folderId } })
+      };
+    }
+
+    // Attach to request for the next function (the Page Controller)
+    req.sharedData = shareRecord;
+    next();
+  } catch (err) {
+    console.error("Error fetching shared item metadata:", err);
+    return res.status(500).render('public-error', { message: "Failed to fetch shared item metadata." });
+  }
+};
+
+
+// === MIDDLEWARE: VALIDATE PUBLIC SHARE TOKEN ===
+export const validatePublicShare = async (req, res, next) => {
+  try {
+    const { shareId } = req.params;
+    const { fileId } = req.query; // If coming from folder share, need to pass specific fileId to download
+
+    // Find the share record
+    const shareRecord = await prisma.share.findUnique({
+      where: { id: shareId },
+      include: { file: true, folder: true }
+    });
+
+    // If token exists, but has no file or folder attached, mark as invalid
+    if (!shareRecord) return res.status(404).send("Invalid share link.");
+
+    // If token is expired, show expired message
+    if (new Date() > shareRecord.expiresAt) {
+      return res.status(403).send("This share link has expired.");
+    }
+
+    // Resolve the File
+    let fileToDownload = null;
+
+    if (shareRecord.file) {
+      // Direct file download
+      fileToDownload = shareRecord.file;
+    } else if (shareRecord.folder && fileId) {
+      // If downloading from a folder, verify file first
+      fileToDownload = await prisma.file.findFirst({
+        where: { 
+          id: parseInt(fileId),
+          folderId: shareRecord.folderId 
+        }
+      });
+    }
+
+    if (!fileToDownload) return res.status(404).send("Error downloading file.");
+
+    // SUCCESS: Attach metadata so startDownload can take over
+    req.fileMetadata = fileToDownload;
+    next();
+  } catch (err) {
+    console.error("Public Share Validation Error:", err);
+    res.status(500).send("Server error during download.");
+  }
+};
