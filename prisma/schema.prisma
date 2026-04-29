@@ -41,6 +41,7 @@ model Folder {
   parentId  Int?
   parent    Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
   children  Folder[]  @relation("FolderToFolder")
+  shares    Share[] // holds shareable access token to the folder
 }
 
 // Files table
@@ -48,10 +49,9 @@ model File {
   id         Int      @id @default(autoincrement())
   name       String   
   url       String   
-  path      String // reintroduce path to make Hard Deletes easiser
+  path      String // reintroduce path to make Hard Deletes easier
   size       Int      
   uploadTime DateTime @default(now())
-  
   user       User     @relation(fields: [userId], references: [id])
   userId     Int
   folder     Folder?  @relation(fields: [folderId], references: [id])
@@ -63,8 +63,10 @@ model File {
 // Share table
 model Share {
   id        String   @id @default(uuid()) // Generates shareable access token
-  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  fileId    Int
+  file      File?     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId    Int?
+  folder    Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId  Int?
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
