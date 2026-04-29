@@ -111,7 +111,8 @@
     share: {
       setup: document.getElementById('shareSetup'),
       result: document.getElementById('shareResult'),
-      fileId: document.getElementById('shareFileId'),
+      itemId: document.getElementById('shareItemId'),
+      itemType: document.getElementById('shareItemType'),
       duration: document.getElementById('shareDuration'),
       linkInput: document.getElementById('generatedLink')
     },
@@ -195,28 +196,29 @@
   })
 
   // === SHARE FEATURE (Fetch API) ===
-  const openShareModal = (fileId) => {
-    dom.share.fileId.value = fileId;
-    // toggleUI(dom.share.setup, true);
-    // toggleUI(dom.share.result, false);
+  const openShareModal = (itemId, itemType) => {
+    dom.share.itemId.value = itemId;
+    dom.share.itemType.value = itemType;
     toggleUI(dom.modals.share, true);
   };
 
   dom.options.share?.addEventListener('click', () => {
     dom.options.menu.classList.remove('active');
-    const fileId = dom.options.menu.dataset.activeId;
-    openShareModal(fileId);
+    const itemId = dom.options.menu.dataset.activeId;
+    const itemType = dom.options.menu.dataset.activeType;
+    openShareModal(itemId, itemType);
   });
 
   async function handleShareClick() {
     // payload = file to share's id and selected duration
     const payload = {
-      fileId: dom.share.fileId.value,
+      itemId: dom.share.itemId.value,
+      itemType: dom.share.itemType.value,
       duration: dom.share.duration.value
     };
 
     try {
-      const response = await fetch('/files/share', {
+      const response = await fetch('/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -225,8 +227,6 @@
 
       if (data.shareLink) {
         dom.share.linkInput.value = data.shareLink;
-        // toggleUI(dom.share.setup, false);
-        // toggleUI(dom.share.result, true);
       }
     } catch (err) {
       console.error("Share failed", err);

@@ -44,7 +44,7 @@ appRouter.get('/download/:fileId', getFileMetadata, startDownload);
 appRouter.post('/folders/create', isAuth, postCreateFolder);
 
 // Route for Fetch API call to get shareable link
-appRouter.post('/files/share', isAuth, generateShareLink);
+appRouter.post('/share', isAuth, generateShareLink);
 
 // Delete routes
 appRouter.delete('/files/:fileId/delete', isAuth, deleteFile);
