@@ -49,25 +49,40 @@ export const getDashboard = async (req, res) => {
 }
 
 export const postCreateFolder = async (req, res, next) => {
-  
   // Grab name and parentId from form
   const { name, parentId } = req.body;
+  const parsedParentId = parentId ? parseInt(parentId) : null;
 
   try {
+    if (parsedParentId) {
+      // Check parent folder ownership
+      const parentFolder = await prisma.folder.findFirst({
+        where: {
+          id: parsedParentId,
+          userId: req.user.id
+        }
+      });
+
+      if (!parentFolder) {
+        req.flash("error", "Invalid destination folder.");
+        return res.redirect("/dashboard");
+      }
+    }
+
     await prisma.folder.create({
       data: {
         name: name,
         userId: req.user.id,
-        parentId: parentId ? parseInt(parentId) : null
+        parentId: parsedParentId
       }
     })
 
-    const redirectUrl = parentId ? `/dashboard/${parentId}` : '/dashboard';
+    const redirectUrl = parsedParentId ? `/dashboard/${parsedParentId}` : '/dashboard';
     res.redirect(redirectUrl);
   } catch (err) {
     console.error("Folder creation error:", err);
-
-    const redirectUrl = parentId ? `/dashboard/${parentId}` : '/dashboard';
+    req.flash("error", "Could not create folder.")
+    const redirectUrl = parsedParentId ? `/dashboard/${parsedParentId}` : '/dashboard';
     res.redirect(redirectUrl);
   }
 }

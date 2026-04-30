@@ -1,15 +1,22 @@
 import { prisma } from "../lib/prisma.js";
 import { supabase } from "../lib/supabase.js";
 
+// === MIDDLEWARE ===
+
+// Fetching File Metadata for Downloads
 export const getFileMetadata = async (req, res, next) => {
   try {
     const { fileId } = req.params;
-    const file = await prisma.file.findUnique({ 
-      where: { id: parseInt(fileId) }
+    // Query for file, verifying user ownership
+    const file = await prisma.file.findFirst({ 
+      where: { 
+        id: parseInt(fileId),
+        userId: req.user.id // Ownership check
+      }
     });
 
     if (!file) {
-      req.flash("error", "File not found.");
+      req.flash("error", "File could not be found or verified to the current user.");
       return res.redirect("/dashboard");
     }
 
@@ -22,6 +29,7 @@ export const getFileMetadata = async (req, res, next) => {
   }
 }
 
+// Download Logic
 export const startDownload = async (req, res) => {
   const file = req.fileMetadata;
 
@@ -48,6 +56,8 @@ export const startDownload = async (req, res) => {
   }
 };
 
+
+// Generate Share Token Link for Shared Access
 export const generateShareLink = async (req, res) => {
   try {
     const { itemId, itemType, duration } = req.body; // Grab from a fetch request
@@ -99,6 +109,16 @@ export const renameFile = async (req, res) => {
     const { fileId } = req.params;
     const { newName } = req.body;
 
+    // Check for file and ownership
+    const file = await prisma.file.findFirst({
+      where: {
+        id: parseInt(fileId),
+        userId: req.user.id
+      }
+    })
+
+    if (!file) return res.status(404).json({ error: "File could not be found or authorized for renaming."})
+    
     await prisma.file.update({
       where: { id: parseInt(fileId) },
       data: { name: newName }
@@ -115,6 +135,14 @@ export const renameFolder = async (req, res) => {
     const { folderId } = req.params;
     const { newName } = req.body;
 
+    const folder = await prisma.folder.findFirst({ 
+      where: {
+        id: parseInt(folderId),
+        userId: req.user.id
+      } });
+
+    if (!folder) return res.status(404).json({ error: "Folder could not be found or authorized for renaming." });
+
     await prisma.folder.update({
       where: { id: parseInt(folderId) },
       data: { name: newName }
@@ -122,7 +150,7 @@ export const renameFolder = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: "Failed to rename folder" });
+    res.status(500).json({ error: "Failed to rename folder." });
   }
 };
 
@@ -133,10 +161,16 @@ export const deleteFile = async (req, res) => {
   try {
     const { fileId } = req.params;
 
-    // 1. Fetch file to get the URL/Path for storage deletion
-    const file = await prisma.file.findUnique({ where: { id: parseInt(fileId) } });
+    // Fetch file to get the URL/Path for storage deletion
+    // Check for file and ownership
+    const file = await prisma.file.findFirst({ 
+      where: {
+        id: parseInt(fileId),
+        userId: req.user.id
+      } 
+    });
     
-    if (!file) return res.status(404).json({ error: "File not found" });
+    if (!file) return res.status(404).json({ error: "File could not be found or authorized for deletion." });
 
     // Delete from Supabase Storage first
     const { error: storageError } = await supabase.storage
@@ -187,6 +221,16 @@ export const deleteFolder = async (req, res) => {
   try {
     const { folderId } = req.params;
 
+    // Check for folder and ownership
+    const folder = await prisma.folder.findFirst({ 
+      where: { 
+        id: parseInt(folderId),
+        userId: req.user.id
+      }
+    });
+
+    if (!folder) return res.status(404).json({ error: "Folder could not be found or authorized for deletion." });
+    
     // Use recursive helper to find all files to be deleted
     const allPaths = await getAllNestedFilePaths(folderId);
 
