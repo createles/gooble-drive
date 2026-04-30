@@ -34,15 +34,17 @@ export const handleUpload = async (req, res) => {
   const file = req.file;
   const userId = req.user.id;
 
+  const redirectURL = folderId ? `/dashboard/${folderId}` : '/dashboard';
+
   if (!file) {
     req.flash('error', 'No file selected.');
-    return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
+    return res.redirect(redirectURL);
   }
 
   const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
   if (!allowedFileTypes.includes(file.mimetype)) {
     req.flash("error", "Invalid file type. Only JPG, PNG, PDF, and TXT files are allowed.")
-    return res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
+    return res.redirect(redirectURL);
   }
 
   try {
@@ -52,7 +54,6 @@ export const handleUpload = async (req, res) => {
     const fileName = `${Date.now()}-${file.originalname}`;
     const filePath = `user-${userId}/${fileName}`;
 
-    console.log(filePath);
     // --- Supabase Handshake ---
     const { data, error } = await supabase.storage
       .from('uploads') // Your bucket name from Phase 1
@@ -83,12 +84,12 @@ export const handleUpload = async (req, res) => {
     });
 
     req.flash('success', 'File uploaded successfully!');
-    res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
+    res.redirect(redirectURL);
 
   } catch (err) {
     console.error('Supabase Upload Error:', err);
     req.flash('error', 'Upload failed.');
-    res.redirect(folderId ? `/dashboard/${folderId}` : '/dashboard');
+    res.redirect(redirectURL);
   }
 };
 
