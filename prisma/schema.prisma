@@ -42,6 +42,10 @@ model Folder {
   parent    Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
   children  Folder[]  @relation("FolderToFolder")
   shares    Share[] // holds shareable access token to the folder
+
+  // EXTRA CREDIT FIELDS
+  isStarred Boolean @default(false)
+  lastAccessed  DateTime  @default(now())  
 }
 
 // Files table
