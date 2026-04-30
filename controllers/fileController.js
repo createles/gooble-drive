@@ -1,3 +1,4 @@
+import path from "node:path";
 import { prisma } from "../lib/prisma.js";
 import { supabase } from "../lib/supabase.js";
 
@@ -394,8 +395,16 @@ export const copyFile = async (req, res) => {
     // Generate new unique path and name for Copy
     // Pattern: "original-path-copy-timestamp" to ensure Supabase uniqueness
     const timestamp = Date.now();
-    const newPath = `${originalFile.path}-copy-${timestamp}`;
-    const newName = `${originalFile.name} (Copy)`;
+
+    // Split path and name to preserve extension on copy
+    // eg. "user-1/my-image.png"
+    const ext = path.extname(originalFile.path); // ".png"
+    const pathBase = originalFile.path.slice(0, originalFile.path.lastIndexOf(ext)); // "user-1/my-image"
+    const nameBase = originalFile.name.slice(0, originalFile.name.lastIndexOf(ext)); // "my-image"
+    
+    // Construct new Path and Name and append extension
+    const newPath = `${pathBase}-copy-${timestamp}${ext}`; // "user-1/my-image-copy-123.png"
+    const newName = `${nameBase} (copy)${ext}`; // "my-image (copy).png"
 
     // Supabase handles Server-side Copy
     const { error: storageError } = await supabase.storage
