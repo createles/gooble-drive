@@ -4,7 +4,7 @@ import { getSignup, postSignup, getLogin, postLogin } from "../controllers/userC
 const userRouter = Router();
 
 // Sign Up Routes
-userRouter.get('/sign-up', getSignup);
+userRouter.get('/signup', getSignup);
 userRouter.post('/signup', postSignup)
 
 // Login Routes
