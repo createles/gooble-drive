@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
   <title><%= title %></title>
 </head>
 <body>
   
   <section class="hero-banner">
-    <h1>Gooble Drive</h1>
-    <h3>Need storage? We'll gobble up your files for you. </h3>
+    <h1 style="font-size: 3rem; color: var(--primary-color); margin-bottom: 0.5rem;">Gooble Drive</h1>
+    <h3 style="color: var(--text-muted); margin-bottom: 2rem;">Need storage? We'll gobble up your files for you.</h3>
+    
+    <a href="/signup" class="btn-upload" style="display: inline-block; text-decoration: none;">Get Started for Free</a>
   </section>
 
-  <a href="/signup">Sign up</a>
   <div class="members-login">
-    <p>Already a member?</p>
-    <a href="/login">Log in</a>
+    <p style="color: var(--text-muted); margin-bottom: 0.5rem;">Already a member?</p>
+    <a href="/login" style="color: var(--primary-color); font-weight: 600;">Log in to your dashboard</a>
   </div>
 
 </body>
