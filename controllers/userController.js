@@ -13,6 +13,13 @@ export const postSignup = async (req, res, next) => {
   try {
     // grab data from form
     const { username, password } = req.body;
+    const confirmPassword = req.body['confirm-password']; // need brackets to access hyphenated name element
+
+    // Validate Password Match
+    if (password !== confirmPassword) {
+      req.flash('error', 'Passwords do not match.');
+      return res.redirect('/signup');
+    }
 
     // hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
