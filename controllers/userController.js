@@ -5,7 +5,9 @@ import { prisma } from '../lib/prisma.js' // the project's prisma client
 // -- Sign Up Handlers -- 
 export const getSignup = (req, res) => {
       res.render("sign-up-form", {
-        title: 'Gooble Drive - Sign Up'
+        title: 'Gooble Drive - Sign Up',
+        errorMessage: req.flash('error'), // pass notif messages to ejs
+        successMessage: req.flash('success')
     })
 };
 
@@ -33,12 +35,13 @@ export const postSignup = async (req, res, next) => {
     });
 
     // redirect to login page on success
+    req.flash('success', 'Account created successfully! Please log in.');
     res.redirect('/login');
 
   } catch (error) {
     console.error("Error creating user:", error);
-    req.flash('error', 'Sign up failed. Username might be taken.');
-    res.redirect('/sign-up'); 
+    req.flash('error', 'Sign up failed. Username is already taken.');
+    res.redirect('/signup'); 
   }
 };
 
