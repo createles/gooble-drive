@@ -120,9 +120,15 @@ export const renameFile = async (req, res) => {
 
     if (!file) return res.status(404).json({ error: "File could not be found or authorized for renaming."})
     
+    // Grab file ext eg. ".pdf"
+    const extension = path.extname(file.name);
+
+    // Construct new name with file extension appended
+    const fullNewName = `${newName}${extension}`;
+    
     await prisma.file.update({
       where: { id: parseInt(fileId) },
-      data: { name: newName }
+      data: { name: fullNewName }
     });
 
     res.json({ success: true });

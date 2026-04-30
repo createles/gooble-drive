@@ -63,9 +63,16 @@
           data-date="<%= file.uploadTime.toDateString() %>">
           <button class="options-btn">&#8942;</button>
           <div class="file-icon" style="font-size: 2rem;">📄</div>
-          <div class="item-name"><%= file.name %></div>
-          <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
-            <%= (file.size / 1024).toFixed(1) %> KB
+          <div class="file-info">
+            <% 
+              const ext = file.name.slice(file.name.lastIndexOf('.')); 
+              const baseName = file.name.replace(ext, '');
+            %>
+            <div class="item-name"><%= baseName %></div>
+            <div class="file-ext"><%= ext.toUpperCase().replace('.', '') %></div>            
+            <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
+              <%= (file.size / 1024).toFixed(1) %> KB
+            </div>
           </div>
         </div>
       <% }) %>
