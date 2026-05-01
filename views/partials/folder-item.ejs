@@ -1,0 +1,16 @@
+<!-- FOLDER GRID ITEM -->
+
+<a 
+  href="/dashboard/<%= folder.id %>"
+  class="grid-item" data-type="folder" 
+  data-id="<%= folder.id %>"
+  data-name="<%= folder.name %>" 
+  data-size="===" 
+  data-date="<%= folder.createdOn.toDateString() %>"
+  data-parentId="<%= folder.parentId || '' %>">
+  <button class="options-btn">&#8942;</button>
+  <div class="folder-icon" style="font-size: 2rem;">📁</div>
+  <div class="item-name">
+    <%= folder.name %>
+  </div>
+</a>

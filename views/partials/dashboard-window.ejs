@@ -17,36 +17,13 @@
   <div class="item-grid" data-current-folder-id="<%= currentFolder ? currentFolder.id : 'root' %>">
     <!-- Loop over folders -->
     <% folders.forEach(folder=> { %>
-      <a href="/dashboard/<%= folder.id %>" class="grid-item" data-type="folder" data-id="<%= folder.id %>"
-        data-name="<%= folder.name %>" data-size="===" data-date="<%= folder.createdOn.toDateString() %>">
-        <button class="options-btn">&#8942;</button>
-        <div class="folder-icon" style="font-size: 2rem;">📁</div>
-        <div class="item-name">
-          <%= folder.name %>
-        </div>
-      </a>
-      <% }) %>
+      <%- include('folder-item.ejs', { folder }) %>
+    <% }) %>
 
-        <!-- Loop over files -->
-        <% files.forEach(file=> { %>
-          <div class="grid-item" data-type="file" data-id="<%= file.id %>" data-name="<%= file.name %>"
-            data-size="<%= (file.size / 1024).toFixed(1) %> KB" data-date="<%= file.uploadTime.toDateString() %>">
-            <button class="options-btn">&#8942;</button>
-            <div class="file-icon" style="font-size: 2rem;">📄</div>
-            <div class="file-info">
-              <% const ext=file.name.slice(file.name.lastIndexOf('.')); const baseName=file.name.replace(ext, '' ); %>
-                <div class="item-name">
-                  <%= baseName %>
-                </div>
-                <div class="file-ext">
-                  <%= ext.toUpperCase().replace('.', '' ) %>
-                </div>
-                <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
-                  <%= (file.size / 1024).toFixed(1) %> KB
-                </div>
-            </div>
-          </div>
-          <% }) %>
+    <!-- Loop over files -->
+    <% files.forEach(file=> { %>
+      <%- include('file-item.ejs', { file }) %>
+    <% }) %>
   </div>
 
 <% } else { %>
