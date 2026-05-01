@@ -6,7 +6,7 @@
   data-id="<%= file.id %>" data-name="<%= file.name %>"
   data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
   data-date="<%= file.uploadTime.toDateString() %>"
-  data-parentId="<%= file.folderId || '' %>">
+  data-parent-id="<%= file.folderId || '' %>">
   <button class="options-btn">&#8942;</button>
   <div class="file-icon" style="font-size: 2rem;">📄</div>
   <div class="file-info">

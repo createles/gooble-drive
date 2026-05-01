@@ -252,7 +252,7 @@
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
     const name = dom.options.menu.dataset.activeName;
-    const currentViewFolder = dom.options.menu.dataset.parentFolder;
+    const currentParentFolder = dom.options.menu.dataset.parentFolder;
     const moveFolderName = document.getElementById('moveFolderName');
     const moveFileName = document.getElementById('moveFileName');
 
@@ -267,8 +267,8 @@
     `;
     const rootOption = document.getElementById('moveRoot');
 
-    // PRE-CHECK: If we are already at the root, disable the Root option
-    if (currentViewFolder === 'root') {
+    // PRE-CHECK: If parent folder is root, disable the Root option
+    if (currentParentFolder === '') {
       rootOption.disabled = true;
       rootOption.textContent += ' (current location)';
       rootOption.style.color = '#999';
@@ -291,7 +291,7 @@
         option.style.color = '#999'; // visual grey out
 
       // If current location folder, already in folder
-      } else if (folder.id == currentViewFolder) {
+      } else if (folder.id == currentParentFolder) {
         option.disabled = true;
         option.textContent += ' (current location)';
         option.style.color = '#999';
