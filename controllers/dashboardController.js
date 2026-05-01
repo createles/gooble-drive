@@ -180,3 +180,55 @@ export const getRecentPage = async (req, res) => {
     res.redirect('/dashboard');
   }
 };
+
+
+export const getStarredPage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Fetch all folders for Sidebar Tree
+    const allFolders = await prisma.folder.findMany({
+      where: { userId: userId },
+      orderBy: { name: 'asc' }
+    });
+
+    const folderTree = buildFolderTree(allFolders);
+
+    // Fetch only Starred Folders
+    const starredFolders = await prisma.folder.findMany({
+      where: {
+        userId: userId,
+        isStarred: true
+      },
+      orderBy: { name: 'asc' } // Alphabetical order is usually best for starred
+    });
+
+    // Fetch only Starred Files
+    const starredFiles = await prisma.file.findMany({
+      where: {
+        userId: userId,
+        isStarred: true
+      },
+      include: {
+        folder: true // Show location badge under file
+      },
+      orderBy: { name: 'asc' } 
+    });
+
+    // Render the dashboard view with the 'starred' viewMode
+    res.render('dashboard', { 
+        title: 'Gooble Drive - Starred',
+        sidebarTree: folderTree, 
+        viewMode: 'starred', // Renders starred-window.ejs
+        currentFolder: null, 
+        folders: starredFolders,
+        files: starredFiles,
+        isPublic: false
+    });
+
+  } catch (error) {
+    console.error("Error fetching starred items:", error);
+    req.flash('error', 'Could not load starred items.');
+    res.redirect('/dashboard');
+  }
+};

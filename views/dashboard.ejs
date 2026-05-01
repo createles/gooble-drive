@@ -21,10 +21,12 @@
 
   <!-- Main Content Area -->
   <main class="app-main">
-    <% if (viewMode !== 'recent') { %>
+    <% if (viewMode === 'dashboard') { %>
       <%- include('partials/dashboard-window.ejs') %>
-    <% } else { %>
+    <% } else if (viewMode === 'recent') { %>
       <%- include('partials/recent-window.ejs') %>
+    <% } else if (viewMode === 'starred') { %>
+      <%- include('partials/starred-window.ejs') %>
     <% } %>
   </main>
   
