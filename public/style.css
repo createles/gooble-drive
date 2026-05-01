@@ -148,6 +148,64 @@ a {
   color: #001d35;
 }
 
+/* Sidebar Tree Styles */
+.tree-root-toggle {
+  cursor: pointer;
+  user-select: none; /* Prevents text highlighting on rapid clicks */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.folder-tree { 
+  list-style: none; 
+  padding-left: 0; 
+  margin-top: 0.5rem;
+}
+
+.nested-tree { 
+  padding-left: 1.5rem; /* The visual indentation for nested dolls */
+  display: none;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  user-select: none; /* Crucial for double-click UX */
+  border-radius: 4px;
+}
+
+.tree-item:hover {
+  background-color: var(--bg-secondary); /* Give visual feedback on hover */
+}
+
+.caret-icon {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.caret-icon.open { 
+  transform: rotate(90deg); /* Points down when expanded */
+}
+
+.caret-spacer { 
+  width: 10px; /* Aligns items that don't have carets */
+}
+
+.hidden { 
+  visibility: hidden; 
+  opacity: 0;
+}
+
+.show-node {
+  display: block;
+}
+
 /* Main Dashboard Area */
 .app-main {
   grid-area: main;
