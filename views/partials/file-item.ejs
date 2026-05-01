@@ -22,6 +22,6 @@
       </div>
   </div>
   <% if (viewMode === 'recent') { %>
-    <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>">📁 <%= file.folder ? file.folder.name : 'My Drive'%></a>
+    <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>">📁 <span class="recent-folder-link"><%= file.folder ? file.folder.name : 'My Drive'%></span></a>
   <% } %>
 </div>
