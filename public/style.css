@@ -181,6 +181,13 @@ a {
 }
 
 /* File/Folder Grid */
+.grid-section-header { /* for Recents view */
+  grid-column: 1 / -1; /* Span across the whole grid */
+  width: 100%;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
 .item-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
