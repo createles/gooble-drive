@@ -1,8 +1,45 @@
 <aside class="app-sidebar">
   <nav class="side-nav">
     <a href="/dashboard" class="nav-item active">Home</a>
-    <a href="/folders" class="nav-item">Folders</a>
     <a href="/dashboard/recent" class="nav-item">Recent</a>
     <a href="/starred" class="nav-item">Starred</a>
+    <div class="folder-tree-section">
+    <h3 class="tree-root-toggle" id="root-folder-btn">
+      Folders
+    </h3>
+    
+    <div id="main-folder-tree" class="hidden">
+      <!-- EJS Recursive Function Declaration -->
+      <% function renderTree(folders) { %>
+        <ul class="folder-tree">
+          <% folders.forEach(folder => { %>
+            <li>
+              <!-- The Interactive Folder Row -->
+              <div class="tree-item" data-folder-id="<%= folder.id %>">
+                <!-- Caret (Only if folder has children) -->
+                <% if (folder.children.length > 0) { %>
+                  <span class="caret-icon">▶</span>
+                <% } else { %>
+                  <span class="caret-spacer"></span> 
+                <% } %>
+                <span class="folder-name">📁 <%= folder.name %></span>
+              </div>
+              
+              <!-- Recursive call for children (Hidden by default) -->
+              <% if (folder.children.length > 0) { %>
+                <div id="nested-<%= folder.id %>" class="nested-tree">
+                  <% renderTree(folder.children) %>
+                </div>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+
+      <!-- Call the function from within the partial -->
+      <!-- Pass sidebarTree from our dashboardController  -->
+      <% renderTree(sidebarTree) %> 
+    </div>
+  </div>
   </nav>
 </aside>
