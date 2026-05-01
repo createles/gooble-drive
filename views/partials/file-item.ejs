@@ -21,4 +21,7 @@
         <%= (file.size / 1024).toFixed(1) %> KB
       </div>
   </div>
+  <% if (viewMode === 'recent') { %>
+    <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>">📁 <%= file.folder ? file.folder.name : 'My Drive'%></a>
+  <% } %>
 </div>

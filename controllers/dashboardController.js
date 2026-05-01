@@ -122,6 +122,9 @@ export const getRecentPage = async (req, res) => {
         userId: userId,
         updatedAt: { gte: oneMonthAgo } // Only fetch files updated in the last 30 days (gte = Greater than or Equal to)
       },
+      include: {
+        folder: true
+      },
       orderBy: { updatedAt: 'desc' }
     });
 
