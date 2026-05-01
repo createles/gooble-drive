@@ -36,6 +36,7 @@ export const getDashboard = async (req, res) => {
     // 5. Render the view with the fetched data
     res.render("dashboard", {
       title: currentFolder ? currentFolder.name : "My Drive",
+      viewMode: 'dashboard',
       currentFolder, // Useful for breadcrumbs
       folders,
       files,
@@ -105,3 +106,46 @@ export const getSharedItemPage = async (req, res) => {
   });
 }
 
+export const getRecentPage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const now = new Date();
+
+    // Define the time thresholds
+    const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+    const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+    const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+
+    // Fetch all files from the past month in a single query
+    const recentFiles = await prisma.file.findMany({
+      where: {
+        userId: userId,
+        updatedAt: { gte: oneMonthAgo } // Only fetch files updated in the last 30 days (gte = Greater than or Equal to)
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
+
+    // Group the files into buckets by filtering
+    const categorizedFiles = {
+      today: recentFiles.filter(file => file.updatedAt >= oneDayAgo),
+      pastWeek: recentFiles.filter(file => file.updatedAt >= oneWeekAgo && file.updatedAt < oneDayAgo),
+      pastMonth: recentFiles.filter(file => file.updatedAt < oneWeekAgo) // Anything left over
+    };
+
+    console.log(categorizedFiles);
+    
+    // Render dashboard view with 'Recent' flag
+    res.render('dashboard', { 
+        title: 'Gooble Drive - Recent Files',
+        viewMode: 'recent',
+        currentFolder: null,
+        categorizedFiles: categorizedFiles,
+        isPublic: false
+    });
+
+  } catch (error) {
+    console.error("Error fetching recent files:", error);
+    req.flash('error', 'Could not load recent files.');
+    res.redirect('/dashboard');
+  }
+};
