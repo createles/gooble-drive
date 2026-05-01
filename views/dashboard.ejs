@@ -448,6 +448,46 @@
     if (e.key === 'Escape') hideAllModals();
   });
 
+  // --- SIDEBAR TREE LOGIC ---
+  // Root 'Folders' Header Toggle
+  const rootFolderBtn = document.getElementById('root-folder-btn');
+  const mainFolderTree = document.getElementById('main-folder-tree');
+
+  if (rootFolderBtn) {
+    rootFolderBtn.addEventListener('click', () => {
+      mainFolderTree.classList.toggle('hidden');
+    });
+  }
+
+  // Single-Click: Expand/Collapse Nested Folders
+  document.addEventListener('click', (e) => {
+    const treeItem = e.target.closest('.tree-item');
+    if (treeItem) {
+      const folderId = treeItem.getAttribute('data-folder-id');
+      const nestedTree = document.getElementById(`nested-${folderId}`);
+      const caret = treeItem.querySelector('.caret-icon');
+
+      // If it has a nested tree, toggle its visibility
+      if (nestedTree) {
+        nestedTree.classList.toggle('show-node');
+        if (caret) caret.classList.toggle('open');
+      }
+    }
+  });
+
+  // Double-Click: Navigate into Folder
+  document.addEventListener('dblclick', (e) => {
+    const treeItem = e.target.closest('.tree-item');
+    if (treeItem) {
+      // Prevent the default browser text-highlighting that happens on double-click
+      e.preventDefault(); 
+      
+      const folderId = treeItem.getAttribute('data-folder-id');
+      // Immediately redirect the user to the folder
+      window.location.href = `/dashboard/${folderId}`;
+    }
+  });
+
   </script>
 </body>
 </html>
