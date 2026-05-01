@@ -14,7 +14,7 @@
 <!-- Conditional Rendering based on database contents -->
 <% if ((locals.folders && folders.length> 0) || (locals.files && files.length > 0)) { %>
 
-  <div class="item-grid" data-current-folder-id="<%= currentFolder ? currentFolder.id : 'root' %>">
+  <div class="item-grid">
     <!-- Loop over folders -->
     <% folders.forEach(folder=> { %>
       <%- include('folder-item.ejs', { folder }) %>

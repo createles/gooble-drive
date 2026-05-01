@@ -6,7 +6,7 @@
 <!-- Conditional Rendering based on database contents -->
 <% if (categorizedFiles && Object.keys(categorizedFiles).length !== 0) { %>
 
-  <div class="item-grid" data-current-folder-id="<%= currentFolder ? currentFolder.id : 'root' %>">
+  <div class="item-grid">
         <!-- Loop over files, sectioned by activity date -->
          <% if (categorizedFiles.today.length > 0) { %>
           <h3 class="grid-section-header"> Today </h3>
