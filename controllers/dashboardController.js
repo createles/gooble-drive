@@ -1,11 +1,29 @@
 import { prisma } from "../lib/prisma.js";
 
+// Recursive Helper for Sidebar Folder Tree
+const buildFolderTree = (folders, parentId = null) => {
+  return folders
+    .filter(folder => folder.parentId === parentId)
+    .map(folder => ({
+      ...folder,
+      children: buildFolderTree(folders, folder.id) 
+    }));
+};
+
 export const getDashboard = async (req, res) => {
   try {
     // Determine current folder location
     // Convert param to Int as Prisma uses Int for IDs
     const folderId = req.params.folderId ? parseInt(req.params.folderId) : null
     const userId = req.user.id;
+
+    // Fetch all folders for sidebar
+    const allFolders = await prisma.folder.findMany({
+      where: { userId: req.user.id },
+      orderBy: { name: 'asc' }
+    });
+
+    const folderTree = buildFolderTree(allFolders);
 
     // Fetch current folder details
     let currentFolder = null;
@@ -36,6 +54,7 @@ export const getDashboard = async (req, res) => {
     // 5. Render the view with the fetched data
     res.render("dashboard", {
       title: currentFolder ? currentFolder.name : "My Drive",
+      sidebarTree: folderTree, // to populate sidebar nav
       viewMode: 'dashboard',
       currentFolder, // Useful for breadcrumbs
       folders,
@@ -111,6 +130,14 @@ export const getRecentPage = async (req, res) => {
     const userId = req.user.id;
     const now = new Date();
 
+    // Fetch all folders for sidebar
+    const allFolders = await prisma.folder.findMany({
+      where: { userId: req.user.id },
+      orderBy: { name: 'asc' }
+    });
+    
+    const folderTree = buildFolderTree(allFolders);
+
     // Define the time thresholds
     const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
     const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
@@ -140,6 +167,7 @@ export const getRecentPage = async (req, res) => {
     // Render dashboard view with 'Recent' flag
     res.render('dashboard', { 
         title: 'Gooble Drive - Recent Files',
+        sidebarTree: folderTree, // to populate sidebar nav
         viewMode: 'recent',
         currentFolder: null,
         categorizedFiles: categorizedFiles,
