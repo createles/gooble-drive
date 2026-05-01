@@ -42,10 +42,7 @@ model Folder {
   parent    Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
   children  Folder[]  @relation("FolderToFolder")
   shares    Share[] // holds shareable access token to the folder
-
-  // EXTRA CREDIT FIELDS
-  isStarred Boolean @default(false)
-  lastAccessed  DateTime  @default(now())  
+  isStarred Boolean @default(false) // For starring important folders
 }
 
 // Files table
@@ -60,8 +57,9 @@ model File {
   userId     Int
   folder     Folder?  @relation(fields: [folderId], references: [id])
   folderId   Int?
-
   shares Share[] // holds shareable access tokens to file
+  updatedAt DateTime @updatedAt // Prisma native update attribute
+  isStarred Boolean @default(false) // For starring important files
 }
 
 // Share table
