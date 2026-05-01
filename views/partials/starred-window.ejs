@@ -1,0 +1,24 @@
+<!-- A link will not be clickable -->
+<div class="breadcrumbs">
+  <a href="" class="breadcrumb-link"">Starred</a>
+</div>
+
+<!-- Conditional Rendering based on database contents -->
+<% if (files && files.length > 0) { %>
+
+  <div class="item-grid">
+    <% files.forEach(file=> { %>
+      <%- include('file-item.ejs', { file }) %>
+    <% }) %>
+  </div>
+
+<% } else { %>
+
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-content">
+        <p>No starred files.</p>
+      </div>
+    </div>
+
+<% } %>
