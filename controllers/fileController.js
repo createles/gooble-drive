@@ -527,3 +527,50 @@ export const validatePublicShare = async (req, res, next) => {
     res.status(500).send("Server error during download.");
   }
 };
+
+// === STAR TOGGLE ===
+export const toggleStar = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { itemType, isStarred } = req.body;
+
+    let item = null;
+
+    if (itemType === 'file') {
+      item = await prisma.file.findFirst({
+        where: {
+          id: parseInt(itemId),
+          userId: req.user.id
+        }
+      });
+    } else if (itemType === 'folder') {
+      item = await prisma.folder.findFirst({
+        where: {
+          id: parseInt(itemId),
+          userId: req.user.id
+        }
+      });
+    } else {
+      return res.status(400).json({ error: "Invalid itemType. Must be 'file' or 'folder'." });
+    }
+
+    if (!item) return res.status(404).json({ error: "File/Folder not found or unauthorized." });
+
+    // set updatedItem AFTER calling prisma update
+    // assign it as return value of .update call
+    const updatedItem = itemType === 'file'
+      ? await prisma.file.update({
+          where: { id: parseInt(itemId) },
+          data: { isStarred }
+        })
+      : await prisma.folder.update({
+          where: { id: parseInt(itemId) },
+          data: { isStarred }
+        });
+
+    res.json({ success: true, isStarred: updatedItem.isStarred });
+  } catch (err) {
+    console.error('Error toggling star:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
