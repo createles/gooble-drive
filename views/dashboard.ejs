@@ -367,6 +367,46 @@
     }
   })
 
+
+  // === STAR/UNSTAR LOGIC ===
+  document.querySelectorAll('.star-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // Prevent triggering other click events (like opening options menu)
+      const itemId = btn.dataset.id;
+      const itemType = btn.dataset.type;
+      const isStarred = btn.dataset.starred === 'true';
+
+      try {
+        const response = await fetch(`/${itemType}s/${itemId}/star`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isStarred: !isStarred,
+            itemType: itemType
+          }) // Toggle star status
+        });
+
+        if (response.ok) {
+          // Optimistically toggle star in UI
+          const icon = btn.querySelector('.icon');
+          if (icon.classList.contains('hollow-star')) {
+            icon.classList.remove('hollow-star');
+            icon.classList.add('filled-star');
+            icon.textContent = '★';
+          } else {
+            icon.classList.remove('filled-star');
+            icon.classList.add('hollow-star');
+            icon.textContent = '☆';
+          }
+        } else {
+          alert("Failed to update star status.");
+        }
+      } catch (err) {
+        console.error("Error toggling star:", err);
+      }
+    });
+  });
+
   // === UPLOAD MODAL ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
   const tabUpload = document.getElementById('tabUpload');
