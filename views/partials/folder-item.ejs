@@ -13,4 +13,11 @@
   <div class="item-name">
     <%= folder.name %>
   </div>
+  <button class="star-toggle-btn" data-id="<%= folder.id %>" data-type="folder" data-starred="<%= folder.isStarred %>">
+    <% if (folder.isStarred) { %>
+      <span class="icon filled-star">★</span> 
+    <% } else { %>
+      <span class="icon hollow-star">☆</span> 
+    <% } %>
+  </button>
 </a>

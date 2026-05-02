@@ -24,4 +24,11 @@
   <% if (viewMode === 'recent') { %>
     <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>">📁 <span class="recent-folder-link"><%= file.folder ? file.folder.name : 'My Drive'%></span></a>
   <% } %>
+  <button class="star-toggle-btn" data-id="<%= file.id %>" data-type="file" data-starred="<%= file.isStarred %>">
+    <% if (file.isStarred) { %>
+      <span class="icon filled-star">★</span> 
+    <% } else { %>
+      <span class="icon hollow-star">☆</span> 
+    <% } %>
+  </button>
 </div>
