@@ -4,7 +4,7 @@ import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated
 import { getDashboard, getSharedItemPage, postCreateFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
-import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getSharedItemMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload, validatePublicShare } from "../controllers/fileController.js";
+import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getSharedItemMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload, toggleStar, validatePublicShare } from "../controllers/fileController.js";
 import multer from "multer";
 
 const appRouter = Router();
@@ -61,6 +61,10 @@ appRouter.patch('/folders/:folderId/move', isAuth, moveFolder);
 
 // Copy Routes
 appRouter.post('/files/:fileId/copy', isAuth, copyFile)
+
+// Star Toggle Route
+appRouter.patch('/files/:itemId/star', isAuth, toggleStar);
+appRouter.patch('/folders/:itemId/star', isAuth, toggleStar);
 
 // Public Routes
 appRouter.get('/share/:shareId', getSharedItemMetadata, getSharedItemPage);
