@@ -336,6 +336,21 @@ a {
   background-color: var(--hover-bg);
 }
 
+.star-toggle-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 1.2rem;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+.star-toggle-btn .icon {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
 /* Empty State Styling */
 .empty-state {
   display: flex;
