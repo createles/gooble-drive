@@ -1,3 +1,7 @@
+/* =========================================
+   GOOBLE DRIVE - GLOBAL STYLES
+   ========================================= */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -12,10 +16,15 @@
   --text-muted: #444746;
   --border-light: #e0e0e0;
   --hover-bg: #e9eef6;
+
+  /* Layout tokens — override at breakpoints */
+  --sidebar-width: 250px;
+  --header-height: 64px;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
 }
@@ -25,42 +34,93 @@ a {
   color: inherit;
 }
 
-/* Dashboard Application Layout */
+/* =========================================
+   DASHBOARD APPLICATION LAYOUT
+   ========================================= */
+
 .dashboard-layout {
   display: grid;
-  grid-template-columns: 250px 1fr; /* Sidebar width, then the rest */
-  grid-template-rows: 64px 1fr;     /* Header height, then the rest */
-  grid-template-areas: 
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
     "header header"
     "sidebar main";
   height: 100vh;
-  overflow: hidden; /* Prevents whole page scrolling, limits to main container */
-  position: relative; /* Establish positioning context for absolute children */
+  overflow: hidden;
+  position: relative;
 }
+
+/* =========================================
+   DETAILS MODAL PANE
+   ========================================= */
 
 #detailsModal {
   visibility: hidden;
   opacity: 0;
-  position: absolute; /* Make it an overlay */
-  top: 64px; /* Position below the header */
+  position: absolute;
+  top: var(--header-height);
   right: 0;
   bottom: 0;
-  width: 300px; /* Fixed width for the details panel */
-  z-index: 20; /* Ensure it's above other content */
-  border-left: 1px solid var(--border-light); /* Always show border, or transition it */
-  background-color: var(--surface-color); /* Use a defined background color */
-  overflow-y: auto; /* Allow scrolling within the details panel */
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; /* Add transform for sliding effect */
-  transform: translateX(100%); /* Start off-screen to the right */
+  width: 300px;
+  z-index: 20;
+  border-left: 1px solid var(--border-light);
+  background-color: var(--surface-color);
+  overflow-y: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  transform: translateX(100%);
 }
 
 .dashboard-layout.show-details #detailsModal {
   visibility: visible;
   opacity: 1;
-  transform: translateX(0); /* Slide into view */
+  transform: translateX(0);
 }
 
-/* Header Partial */
+.details-cont {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.details-cont > button#closeDetails {
+  align-self: flex-end;
+  background: none;
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.details-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.details-data {
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+
 .app-header {
   grid-area: header;
   background-color: var(--surface-color);
@@ -70,34 +130,44 @@ a {
   padding: 0 1.5rem;
   border-bottom: 1px solid var(--border-light);
   z-index: 10;
+  gap: 1rem;
 }
 
 .brand-container {
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* The spacing between the logo and the text */
-  text-decoration: none; /* Removes link underline */
+  gap: 0.75rem;
+  text-decoration: none;
   color: var(--text-muted);
   transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
 .brand-container:hover {
-  opacity: 0.8; /* Slight visual feedback when hovering over the logo */
+  opacity: 0.8;
 }
 
 .brand-icon {
-  width: 32px; /* Adjust this value to make your SVG bigger or smaller */
+  width: 32px;
   height: 32px;
-  object-fit: contain; /* Ensures the SVG doesn't stretch weirdly */
+  object-fit: contain;
 }
 
 .brand-name {
   font-size: 1.25rem;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Search bar */
+.search-bar {
+  position: relative;
+  flex: 1;
+  max-width: 480px;
 }
 
 .search-bar input {
-  width: 400px;
+  width: 100%;
   padding: 0.75rem 1rem;
   border: none;
   border-radius: 24px;
@@ -109,25 +179,33 @@ a {
 
 .search-bar input:focus {
   background-color: var(--surface-color);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .search-dropdown {
   display: none;
-  position: absolute; 
-  top: 100%; 
-  left: 0; 
-  right: 0; 
-  background: white; 
-  border: 1px solid #ccc; 
-  z-index: 1000; 
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .search-result {
-  padding: 10px; 
+  padding: 0.75rem 1rem;
   cursor: pointer;
   border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.search-result:last-child {
+  border-bottom: none;
 }
 
 .search-result:hover {
@@ -137,12 +215,14 @@ a {
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .user-name {
   font-weight: 500;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .avatar {
@@ -155,14 +235,20 @@ a {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
-/* Sidebar Partial */
+/* =========================================
+   SIDEBAR
+   ========================================= */
+
 .app-sidebar {
   grid-area: sidebar;
   background-color: var(--bg-color);
   padding: 1.5rem 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .side-nav {
@@ -177,10 +263,11 @@ a {
   color: var(--text-main);
   font-weight: 500;
   transition: background-color 0.2s;
+  display: block;
 }
 
 .nav-item:hover {
-  background-color: rgba(0,0,0,0.04);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .nav-item.active {
@@ -188,23 +275,43 @@ a {
   color: #001d35;
 }
 
-/* Sidebar Tree Styles */
+/* Mobile sidebar overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Sidebar Tree */
+.folder-tree-section {
+  margin-top: 1rem;
+}
+
 .tree-root-toggle {
   cursor: pointer;
-  user-select: none; /* Prevents text highlighting on rapid clicks */
+  user-select: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
-.folder-tree { 
-  list-style: none; 
-  padding-left: 0; 
+.folder-tree {
+  list-style: none;
+  padding-left: 0;
   margin-top: 0.5rem;
 }
 
-.nested-tree { 
-  padding-left: 1.5rem; /* The visual indentation for nested dolls */
+.nested-tree {
+  padding-left: 1.5rem;
   display: none;
 }
 
@@ -212,33 +319,34 @@ a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0;
+  padding: 0.3rem 0.25rem;
   cursor: pointer;
-  user-select: none; /* Crucial for double-click UX */
+  user-select: none;
   border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .tree-item:hover {
-  background-color: var(--bg-secondary); /* Give visual feedback on hover */
+  background-color: var(--hover-bg);
 }
 
 .caret-icon {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
   transition: transform 0.2s ease;
   display: inline-block;
 }
 
-.caret-icon.open { 
-  transform: rotate(90deg); /* Points down when expanded */
+.caret-icon.open {
+  transform: rotate(90deg);
 }
 
-.caret-spacer { 
-  width: 10px; /* Aligns items that don't have carets */
+.caret-spacer {
+  width: 10px;
 }
 
-.hidden { 
-  visibility: hidden; 
+.hidden {
+  visibility: hidden;
   opacity: 0;
 }
 
@@ -246,23 +354,27 @@ a {
   display: block;
 }
 
-/* Main Dashboard Area */
+/* =========================================
+   MAIN CONTENT AREA
+   ========================================= */
+
 .app-main {
   grid-area: main;
   background-color: var(--surface-color);
-  border-radius: 16px 0 0 0; 
+  border-radius: 16px 0 0 0;
   margin-top: 0.5rem;
   padding: 2rem;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
-/* Breadcrumbs / Path Navigation */
+/* Breadcrumbs */
 .breadcrumbs {
   font-size: 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .breadcrumb-link {
@@ -278,125 +390,213 @@ a {
   color: var(--text-muted);
 }
 
-/* File/Folder Grid */
-.grid-section-header { /* for Recents view */
-  grid-column: 1 / -1; /* Span across the whole grid */
+.breadcrumb-current {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* =========================================
+   FILE / FOLDER GRID
+   ========================================= */
+
+.grid-section-header {
+  grid-column: 1 / -1;
   width: 100%;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .item-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
 }
 
 .grid-item {
   background-color: var(--bg-color);
-  padding: 1.5rem;
+  padding: 1.25rem 1rem;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   cursor: pointer;
   position: relative;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+  min-height: 120px;
 }
 
 .grid-item:hover {
   background-color: var(--hover-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.item-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  word-break: break-word;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.item-size,
+.item-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.file-ext {
+  font-size: 0.7rem;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .recent-folder-link {
   color: var(--text-muted);
   font-style: italic;
+  font-size: 0.8rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px; 
+  max-width: 140px;
 }
 
+/* Options button */
 .options-btn {
   position: absolute;
-  top: 0.5rem;
-  right: 1.2rem;
+  top: 0.4rem;
+  right: 0.6rem;
   background: none;
   border: none;
-  padding: 0.5rem 0.9rem;
+  padding: 0.35rem 0.6rem;
   border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.15s, background-color 0.15s;
+}
+
+.grid-item:hover .options-btn {
+  opacity: 1;
 }
 
 .options-btn:hover {
   background-color: #c8ccd3;
 }
 
+/* Star toggle */
+.star-toggle-btn {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0.35rem;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.grid-item:hover .star-toggle-btn {
+  opacity: 1;
+}
+
+.star-toggle-btn .filled-star {
+  opacity: 1 !important;
+}
+
+.grid-item:hover .star-toggle-btn,
+.star-toggle-btn .filled-star {
+  opacity: 1;
+}
+
+.star-toggle-btn .icon {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+/* Always show filled stars */
+.star-toggle-btn[data-starred="true"] {
+  opacity: 1;
+}
+
+/* =========================================
+   OPTIONS CONTEXT MENU
+   ========================================= */
+
 .options-menu {
   visibility: hidden;
   opacity: 0;
-  position: absolute;
+  position: fixed;
   background-color: var(--surface-color);
   border: 1px solid var(--border-light);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  padding: 0.5rem 0;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  padding: 0.4rem 0;
   min-width: 180px;
   z-index: 1000;
-  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
-  transform: translateY(-10px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transform: translateY(-6px) scale(0.98);
 }
 
 .options-menu.active {
   visibility: visible;
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
-.options-menu button, .options-menu a {
+.options-menu button,
+.options-menu a {
   display: block;
   width: 100%;
-  padding: 0.75rem 1.5rem;
+  padding: 0.65rem 1.25rem;
   border: none;
   background: none;
   text-align: left;
-  /* Reset button-specific appearance */
-  -webkit-appearance: none; /* For Safari/Chrome */
-  -moz-appearance: none;    /* For Firefox */
-  appearance: none;         /* Standard */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   cursor: pointer;
   color: #000000;
   font-size: 0.9rem;
-  font-family: inherit; /* Inherit from body for consistency */
-  font-weight: 500;     /* Explicitly set font-weight to match common button styles */
-  line-height: normal;  /* Normalize line-height */
+  font-family: inherit;
+  font-weight: 500;
+  line-height: normal;
 }
 
-.options-menu button:hover, .options-menu a:hover {
+.options-menu button:hover,
+.options-menu a:hover {
   background-color: var(--hover-bg);
 }
 
-.star-toggle-btn {
-  position: absolute;
-  top: 0.5rem;
-  left: 1.2rem;
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 50%;
-}
+/* =========================================
+   EMPTY STATE
+   ========================================= */
 
-.star-toggle-btn .icon {
-  font-size: 1.2rem;
-  color: var(--primary-color);
-}
-
-/* Empty State Styling */
 .empty-state {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60%;
+  min-height: 50vh;
   text-align: center;
 }
 
@@ -405,16 +605,22 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  padding: 3rem;
+  padding: 3rem 2rem;
   border: 2px dashed var(--border-light);
   border-radius: 16px;
   background-color: #fafafa;
+  max-width: 360px;
+  width: 100%;
 }
 
 .empty-state-content p {
   color: var(--text-muted);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
 }
+
+/* =========================================
+   BUTTONS
+   ========================================= */
 
 .btn-upload {
   background-color: var(--primary-color);
@@ -426,33 +632,50 @@ a {
   font-weight: 500;
   cursor: pointer;
   transition: box-shadow 0.2s, background-color 0.2s;
+  display: inline-block;
+  text-align: center;
 }
 
 .btn-upload:hover {
   background-color: #0842a0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-
-/* Index and Auth Pages (Login, Signup, Home) */
-.hero-banner, .members-login, .login-cont, .sign-up-cont {
-  max-width: 400px;
-  margin: 4rem auto;
-  text-align: center;
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.login-cont form, .sign-up-cont form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  text-align: left;
+.btn-primary:hover {
+  background-color: #0842a0;
 }
 
-.login-cont input, .sign-up-cont input {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
+.btn-secondary {
+  background: none;
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+  padding: 0.65rem 1.25rem;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
+
+.btn-secondary:hover {
+  background-color: var(--hover-bg);
+}
+
+/* =========================================
+   FLOATING ADD BUTTON
+   ========================================= */
 
 .floating-add-btn {
   position: fixed;
@@ -462,7 +685,7 @@ a {
   height: 56px;
   border-radius: 16px;
   background-color: var(--surface-color);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -480,8 +703,64 @@ a {
 }
 
 /* =========================================
-   Modal Styles
+   AUTH / INDEX PAGES
    ========================================= */
+
+.hero-banner,
+.members-login,
+.login-cont,
+.sign-up-cont {
+  max-width: 420px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 0 1.5rem;
+}
+
+.login-cont form,
+.sign-up-cont form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.login-cont input,
+.sign-up-cont input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.25rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-cont input:focus,
+.sign-up-cont input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.12);
+}
+
+.login-cont label,
+.sign-up-cont label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* Notification message */
+.notif-message {
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* =========================================
+   MODALS
+   ========================================= */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -489,23 +768,18 @@ a {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
-  
-  /* Use opacity + visibility to handle fade in */
-  display: flex; 
+  display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  /* Blur background; Must make background-color somewhat transparent first */
   backdrop-filter: blur(2px);
-  
-  /* Invisible + Hidden at first */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   will-change: opacity;
+  padding: 1rem;
 }
 
-/* Modal becomes visible */
 .modal-overlay.active {
   opacity: 1;
   visibility: visible;
@@ -513,14 +787,14 @@ a {
 
 .modal-content {
   background-color: var(--surface-color);
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 16px;
-  width: 90%;
+  width: 100%;
   max-width: 450px;
-  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
   position: relative;
-  
-  /* Refined Animation */
+  max-height: 90vh;
+  overflow-y: auto;
   transform: translateY(20px);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
@@ -530,7 +804,7 @@ a {
   transform: translateY(0);
 }
 
-/* MODAL TAB SHOW & HIDE STYLING */
+/* Modal tabs */
 .modal-header-tabs {
   display: flex;
   border-bottom: 1px solid var(--border-light);
@@ -539,12 +813,12 @@ a {
 }
 
 .tab-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.65rem 1.25rem;
   border: none;
   background: none;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 }
 
@@ -560,16 +834,14 @@ a {
   margin-left: auto;
 }
 
-/* The active "foreground" tab */
 .tab-btn.active {
   color: var(--text-main);
   border-bottom: 2px solid var(--primary-color);
 }
 
-/* The inactive "greyed out" background tab */
 .tab-btn.inactive {
   color: var(--text-muted);
-  background-color: #f1f3f4; /* Subtle grey background */
+  background-color: #f1f3f4;
   opacity: 0.7;
 }
 
@@ -580,10 +852,11 @@ a {
 .close-modal {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.75rem;
   cursor: pointer;
   color: var(--text-muted);
   line-height: 1;
+  padding: 0.25rem;
 }
 
 .upload-form {
@@ -606,6 +879,15 @@ a {
 
 .form-group input[type="file"] {
   padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 .form-group select {
@@ -613,33 +895,500 @@ a {
   border: 1px solid var(--border-light);
   border-radius: 8px;
   background-color: var(--bg-color);
+  font-size: 0.95rem;
 }
 
-/* SHARE MODAL STYLES */
+.modal-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
 
-/* PUBLIC VIEW STYLES */
+/* Move modal specifics */
+#moveModal .modal-content h3 {
+  margin-bottom: 0.75rem;
+}
+
+#moveModal p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+#folderSelect {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Share modal */
+.modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.link-copy-box {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-copy-box input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.link-copy-box button {
+  padding: 0.6rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* =========================================
+   PUBLIC SHARED VIEW
+   ========================================= */
+
 .public-view {
-  grid-template-columns: 1fr; /* Removes the sidebar column */
+  grid-template-columns: 1fr;
 }
+
 .public-main {
-  padding: 40px;
+  padding: 2rem 2.5rem;
   max-width: 1000px;
   margin: 0 auto;
 }
+
 .btn-download-public {
   display: inline-block;
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #1a73e8;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
   color: white;
   text-decoration: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 0.875rem;
   text-align: center;
+  transition: background-color 0.2s;
 }
+
 .btn-download-public:hover {
-  background-color: #1557b0;
+  background-color: #0842a0;
 }
+
 .grid-item.read-only {
   cursor: default;
+}
+
+/* =========================================
+   HAMBURGER MENU BUTTON (mobile only)
+   ========================================= */
+
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--text-main);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* =========================================
+   RESPONSIVE — LARGE DESKTOP  ≥ 1440px
+   ========================================= */
+
+@media (min-width: 1440px) {
+  :root {
+    --sidebar-width: 280px;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .search-bar {
+    max-width: 560px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE — STANDARD DESKTOP  1024px – 1439px
+   (default styles cover this range)
+   ========================================= */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  :root {
+    --sidebar-width: 230px;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+/* =========================================
+   RESPONSIVE — TABLET  768px – 1023px
+   ========================================= */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --sidebar-width: 200px;
+    --header-height: 60px;
+  }
+
+  /* Sidebar: narrower, icon-only-friendly */
+  .app-sidebar {
+    padding: 1rem 0.75rem;
+  }
+
+  .brand-name {
+    font-size: 1.1rem;
+  }
+
+  .search-bar {
+    max-width: 320px;
+  }
+
+  .user-name {
+    display: none; /* Hide username text, keep avatar */
+  }
+
+  .app-main {
+    padding: 1.5rem;
+  }
+
+  .breadcrumbs {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .grid-item {
+    padding: 1rem 0.75rem;
+    min-height: 110px;
+  }
+
+  .nav-item {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Details pane: full-screen overlay on tablet */
+  #detailsModal {
+    width: 280px;
+  }
+
+  /* Keep star/options always visible on touch */
+  .options-btn,
+  .star-toggle-btn {
+    opacity: 1;
+  }
+
+  .floating-add-btn {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+}
+
+/* =========================================
+   RESPONSIVE — MOBILE  ≤ 767px
+   ========================================= */
+
+@media (max-width: 767px) {
+  :root {
+    --header-height: 56px;
+    --sidebar-width: 260px; /* full-width slide-in drawer */
+  }
+
+  /* ---- Layout: single column, sidebar becomes a drawer ---- */
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+    overflow: hidden;
+  }
+
+  /* Sidebar: off-canvas drawer */
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    z-index: 50;
+    background-color: var(--surface-color);
+    padding: 1.5rem 1rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    overflow-y: auto;
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Hamburger button */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Header adjustments */
+  .app-header {
+    padding: 0 1rem;
+    gap: 0.75rem;
+  }
+
+  .brand-name {
+    display: none; /* logo only on mobile */
+  }
+
+  /* Full-width search bar */
+  .search-bar {
+    flex: 1;
+    max-width: none;
+  }
+
+  .search-bar input {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  /* Main area full width */
+  .app-main {
+    grid-area: main;
+    padding: 1.25rem 1rem;
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  .breadcrumbs {
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Grid: 2 columns on mobile */
+  .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .grid-item {
+    padding: 1rem 0.75rem;
+    min-height: 100px;
+    gap: 0.5rem;
+  }
+
+  .item-name {
+    font-size: 0.82rem;
+  }
+
+  /* Always show options & star on touch devices */
+  .options-btn,
+  .star-toggle-btn {
+    opacity: 1;
+  }
+
+  .options-btn {
+    padding: 0.3rem 0.5rem;
+  }
+
+  /* Details panel: full-screen overlay on mobile */
+  #detailsModal {
+    top: 0;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-light);
+    z-index: 60;
+  }
+
+  /* Options menu: full-width bottom sheet on mobile */
+  .options-menu {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    border-radius: 16px 16px 0 0;
+    padding: 0.5rem 0 1.5rem;
+    transform: translateY(100%);
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0.2s;
+  }
+
+  .options-menu.active {
+    transform: translateY(0);
+  }
+
+  .options-menu button,
+  .options-menu a {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Modal: full-width, anchored near bottom */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+    padding: 1.5rem 1.25rem;
+    transform: translateY(100%);
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: translateY(0);
+  }
+
+  .modal-header-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .link-copy-box {
+    flex-direction: column;
+  }
+
+  .link-copy-box input {
+    width: 100%;
+  }
+
+  .modal-buttons {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .modal-buttons button,
+  .modal-buttons .btn-primary,
+  .modal-buttons .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Floating add button */
+  .floating-add-btn {
+    bottom: 1.5rem;
+    right: 1.25rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.6rem;
+    border-radius: 14px;
+  }
+
+  /* Auth pages */
+  .hero-banner,
+  .members-login,
+  .login-cont,
+  .sign-up-cont {
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+  }
+
+  /* Public shared view */
+  .public-view .app-header {
+    padding: 0 1rem;
+  }
+
+  .public-main {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Grid section headers */
+  .grid-section-header {
+    font-size: 0.9rem;
+  }
+
+  /* Empty state */
+  .empty-state-content {
+    padding: 2rem 1.25rem;
+  }
+}
+
+/* =========================================
+   RESPONSIVE — EXTRA SMALL MOBILE  ≤ 380px
+   ========================================= */
+
+@media (max-width: 380px) {
+  .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .grid-item {
+    padding: 0.85rem 0.6rem;
+  }
+
+  .item-name {
+    font-size: 0.78rem;
+  }
+
+  .search-bar input {
+    font-size: 0.85rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .app-main {
+    padding: 1rem 0.85rem;
+  }
+}
+
+/* =========================================
+   UTILITY: MODAL OPEN BODY LOCK
+   ========================================= */
+
+body.modal-open {
+  overflow: hidden;
 }
