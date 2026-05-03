@@ -179,14 +179,22 @@ export const deleteFile = async (req, res) => {
     
     if (!file) return res.status(404).json({ error: "File could not be found or authorized for deletion." });
 
+
+    // Count how many records share this same path (duplicated files)
+    const pathCount = await prisma.file.count({
+      where: { path: file.path }
+    });
+
     // Delete from Supabase Storage first
-    const { error: storageError } = await supabase.storage
-      .from('uploads')
-      .remove([file.path]);
+    if (pathCount === 1) { // Only delete from storage if this is the last record with that path  
+      const { error: storageError } = await supabase.storage
+        .from('uploads')
+        .remove([file.path]);
 
-    if (storageError) throw storageError;
+      if (storageError) throw storageError;
+    }
 
-    // 2. Delete from Database
+    // Delete from Database
     await prisma.file.delete({ where: { id: parseInt(fileId) } });
 
     res.json({ success: true });
@@ -198,14 +206,17 @@ export const deleteFile = async (req, res) => {
 
 
 // Recursive helper to find ALL nested file paths
-const getAllNestedFilePaths = async (folderId) => {
+const getAllNestedFileData = async (folderId) => {
+  let fileIds = []; // holds all fileIds to be deleted
   let paths = [];
 
   // Get all files in CURRENT folder
   const files = await prisma.file.findMany({
     where: { folderId: parseInt(folderId) },
-    select: { path: true }
+    select: { id: true, path: true }
   });
+
+  fileIds.push(...files.map(f => f.id));
   paths.push(...files.map(f => f.path));
 
   // Get all sub-folders in located in CURRENT folder
@@ -217,10 +228,11 @@ const getAllNestedFilePaths = async (folderId) => {
   /// Recursively call this function for each sub-folder
   for (const folder of subFolders) {
     const nestedPaths = await getAllNestedFilePaths(folder.id);
+    fileIds.push(...nestedPaths.fileIds);
     paths.push(...nestedPaths);
   }
 
-  return paths;
+  return { fileIds, paths }; // Return an object with both fileIds and paths
 };
 
 
@@ -239,11 +251,28 @@ export const deleteFolder = async (req, res) => {
     if (!folder) return res.status(404).json({ error: "Folder could not be found or authorized for deletion." });
     
     // Use recursive helper to find all files to be deleted
-    const allPaths = await getAllNestedFilePaths(folderId);
+    const { fileIds, paths } = await getAllNestedFileData(folderId);
+    const uniquePaths = [...new Set(paths)]; // Remove duplicate paths
 
-    // If we found any files, delete them from Supabase in one go
-    if (allPaths.length > 0) {
-      await supabase.storage.from('uploads').remove(allPaths);
+    // Determine which paths are safe to delete (not shared by other records outside this folder tree)
+    const pathsToRemoveFromStorage = [];
+
+    for (const path of uniquePaths) {
+      // Check for database records sharing this path
+      const sharedCount = await prisma.file.count({
+        where: { 
+          path: path, 
+          id: { notIn: fileIds } } // Exclude files that are being deleted in this operation 
+      });
+
+      if (sharedCount === 0) { // Only delete from storage if no other records share this path
+        pathsToRemoveFromStorage.push(path);
+      }
+    }
+
+    // Delete them from Supabase in one go
+    if (pathsToRemoveFromStorage.length > 0) {
+      await supabase.storage.from('uploads').remove(pathsToRemoveFromStorage);
     }
 
     // Prisma wipes folders from database w/ help from OnCascade
