@@ -1,7 +1,7 @@
 import { Router } from "express";
 import userRouter from "./userRouter.js";
 import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated import path
-import { getDashboard, getSharedItemPage, postCreateFolder } from "../controllers/dashboardController.js";
+import { getDashboard, getSharedItemPage, postCreateFolder, postCopyFolder } from "../controllers/dashboardController.js";
 import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
 import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getSharedItemMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload, toggleStar, validatePublicShare } from "../controllers/fileController.js";
@@ -60,7 +60,8 @@ appRouter.patch('/files/:fileId/move', isAuth, moveFile);
 appRouter.patch('/folders/:folderId/move', isAuth, moveFolder);
 
 // Copy Routes
-appRouter.post('/files/:fileId/copy', isAuth, copyFile)
+appRouter.post('/files/:fileId/copy', isAuth, copyFile);
+appRouter.post('/folders/:folderId/copy', isAuth, postCopyFolder);
 
 // Star Toggle Route
 appRouter.patch('/files/:itemId/star', isAuth, toggleStar);

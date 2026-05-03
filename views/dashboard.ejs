@@ -427,26 +427,43 @@
   });
 
 
-  // === COPY FILES LOGIC ===
+  // === COPY FILES/FOLDERS LOGIC ===
   dom.options.copy.addEventListener('click', async () => {
     const id = dom.options.menu.dataset.activeId;
     if (!id) return;
 
     try {
-      const response = await fetch(`/files/${id}/copy`, {
-        method: 'POST',
-        header: { 'Content-Type' : 'application/json' }
-      });
+      if (dom.options.menu.dataset.activeType === 'folder') {
+        const confirmCopy = confirm("Copying a folder will also copy all of its contents. Do you want to proceed?");
+        
+        if (!confirmCopy) return;
+
+        const response = await fetch(`/folders/${id}/copy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      
+      if (dom.options.menu.dataset.activeType === 'file') {
+         const confirmCopy = confirm("Do you want to make a copy of this file?");
+        
+        if (!confirmCopy) return;
+
+        const response = await fetch(`/files/${id}/copy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
 
       const result = await response.json();
       
       if (result.success) {
         window.location.reload();
       } else {
-        alert(result.error || "Failed to copy file.");
+        alert(result.error || "Failed to copy item.");
       }
     } catch (err) {
-      console.error("Error copying file:", err);
+      console.error("Error with copy operation:", err);
     } finally {
       toggleUI(dom.options.menu, false);
     }

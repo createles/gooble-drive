@@ -386,7 +386,7 @@ export const moveFile = async (req, res) => {
 };
 
 
-//  === COPY FILES ===
+//  === COPY FILES/FOLDERS ===
 export const copyFile = async (req, res) => {
   try {
     const { fileId } = req.params;
@@ -439,6 +439,49 @@ export const copyFile = async (req, res) => {
   }
 };
 
+
+export const copyFolderRecursive = async (originalFolderId, targetParentId, userId) => {
+  try {
+    // Fetch the original folder details
+    const original = await prisma.folder.findUnique({
+      where: { id: originalFolderId },
+      include: { files: true, children: true } // 'Children' are immediate sub-folders
+    });
+
+    // Create new folder record
+    const newFolder = await prisma.folder.create({
+      data: {
+        name: `${original.name} (copy)`,
+        userId: userId,
+        parentId: targetParentId, // Where the copy is being placed
+      }
+    });
+
+    // Copy all Files in this folder
+    if (original.files.length > 0) {
+      const fileData = original.files.map(file => ({
+        name: file.name,
+        url: file.url,
+        path: file.path,
+        size: file.size,
+        userId: userId,
+        folderId: newFolder.id // Link to the NEW folder
+      }));
+      
+      await prisma.file.createMany({ data: fileData });
+    }
+
+    // Recursively copy subfolders
+    for (const childFolder of original.children) {
+      await copyFolderRecursive(childFolder.id, newFolder.id, userId);
+    }
+
+    return newFolder; // Return the newly created folder object
+  } catch (err) {
+    console.error("Recursive Copy Error:", err);
+    throw new Error("Failed to copy folder tree.");
+  }
+}
 
 // === DISPLAY SHARED ITEM METADATA (for both files and folders) ===
 export const getSharedItemMetadata = async (req, res, next) => {

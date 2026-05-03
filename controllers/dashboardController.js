@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { copyFolderRecursive } from "./fileController.js";
 
 // Recursive Helper for Sidebar Folder Tree
 const buildFolderTree = (folders, parentId = null) => {
@@ -108,6 +109,28 @@ export const postCreateFolder = async (req, res, next) => {
 }
 
 
+export const postCopyFolder = async (req, res) => {
+  const folderId = parseInt(req.params.folderId, 10);
+  const currentFolderId = req.body.currentFolderId ? parseInt(req.body.currentFolderId, 10) : null;
+  if (Number.isNaN(folderId)) {
+    req.flash('error', 'Invalid folder selected for copying.');
+    const redirectUrl = currentFolderId ? `/dashboard/${currentFolderId}` : '/dashboard';
+    return res.redirect(redirectUrl);
+  }
+
+  try {
+    await copyFolderRecursive(folderId, currentFolderId, req.user.id);
+    req.flash('success', 'Folder copied successfully.');
+  } catch (err) {
+    console.error('Folder copy error:', err);
+    req.flash('error', 'Could not copy folder.');
+  }
+
+  const redirectUrl = currentFolderId ? `/dashboard/${currentFolderId}` : '/dashboard';
+  res.redirect(redirectUrl );
+};
+
+
 // Renders Shared Item Page
 export const getSharedItemPage = async (req, res) => {
   const sharedData = req.sharedData; // Set by middleware
@@ -124,6 +147,7 @@ export const getSharedItemPage = async (req, res) => {
     user: req.user || null // Pass user info if logged in, else null
   });
 }
+
 
 export const getRecentPage = async (req, res) => {
   try {
@@ -162,8 +186,7 @@ export const getRecentPage = async (req, res) => {
       pastMonth: recentFiles.filter(file => file.updatedAt < oneWeekAgo) // Anything left over
     };
 
-    console.log(categorizedFiles);
-    
+
     // Render dashboard view with 'Recent' flag
     res.render('dashboard', { 
         title: 'Gooble Drive - Recent Files',
