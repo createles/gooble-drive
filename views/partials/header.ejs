@@ -1,21 +1,27 @@
 <header class="app-header">
+  <% if (!isPublic) { %>
+  <!-- Hamburger button — only visible on mobile via CSS -->
+  <button class="hamburger-btn" id="sidebarToggleBtn" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <% } %>
+
   <a href="/dashboard" class="brand-container">
     <img src="/gooble_drive_logo.svg" alt="Gooble Drive Logo" class="brand-icon">
     <span class="brand-name">Gooble Drive</span>
   </a>
+
   <% if (!isPublic) { %>
   <div class="search-bar" style="position: relative;">
     <input type="text" id="searchInput" placeholder="Search files and folders..." autocomplete="off">
-    
-    <div id="searchResults" class="search-dropdown">
-      </div>
+    <div id="searchResults" class="search-dropdown"></div>
   </div>
 
   <div class="user-profile">
-    <!-- Pass currentUser to display name -->
     <span class="user-name"><%= currentUser.username %></span>
     <div class="avatar">
-      <!-- Grabs the first letter of their username for the icon -->
       <%= currentUser.username.charAt(0).toUpperCase() %>
     </div>
   </div>

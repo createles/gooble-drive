@@ -636,6 +636,36 @@
     }
   });
 
+    // === MOBILE SIDEBAR TOGGLE ===
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appSidebar = document.getElementById('appSidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  function openSidebar() {
+    appSidebar?.classList.add('open');
+    sidebarOverlay?.classList.add('active');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSidebar() {
+    appSidebar?.classList.remove('open');
+    sidebarOverlay?.classList.remove('active');
+    document.body.classList.remove('modal-open');
+  }
+
+  sidebarToggleBtn?.addEventListener('click', () => {
+    appSidebar?.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+
+  sidebarOverlay?.addEventListener('click', closeSidebar);
+
+  // Close sidebar when a nav link is tapped on mobile
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 767) closeSidebar();
+    });
+  });
+
   </script>
 </body>
 </html>

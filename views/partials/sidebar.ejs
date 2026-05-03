@@ -1,45 +1,44 @@
-<aside class="app-sidebar">
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="app-sidebar" id="appSidebar">
   <nav class="side-nav">
     <a href="/dashboard" class="nav-item <%= viewMode === 'dashboard' ? 'active' : '' %>">Home</a>
     <a href="/dashboard/recent" class="nav-item <%= viewMode === 'recent' ? 'active' : '' %>">Recent</a>
     <a href="/dashboard/starred" class="nav-item <%= viewMode === 'starred' ? 'active' : '' %>">Starred</a>
-    <div class="folder-tree-section">
-    <h3 class="tree-root-toggle" id="root-folder-btn">
-      Folders
-    </h3>
-    
-    <div id="main-folder-tree" class="hidden">
-      <!-- EJS Recursive Function Declaration -->
-      <% function renderTree(folders) { %>
-        <ul class="folder-tree">
-          <% folders.forEach(folder => { %>
-            <li>
-              <!-- The Interactive Folder Row -->
-              <div class="tree-item" data-folder-id="<%= folder.id %>">
-                <!-- Caret (Only if folder has children) -->
-                <% if (folder.children.length > 0) { %>
-                  <span class="caret-icon">▶</span>
-                <% } else { %>
-                  <span class="caret-spacer"></span> 
-                <% } %>
-                <span class="folder-name">📁 <%= folder.name %></span>
-              </div>
-              
-              <!-- Recursive call for children (Hidden by default) -->
-              <% if (folder.children.length > 0) { %>
-                <div id="nested-<%= folder.id %>" class="nested-tree">
-                  <% renderTree(folder.children) %>
-                </div>
-              <% } %>
-            </li>
-          <% }) %>
-        </ul>
-      <% } %>
 
-      <!-- Call the function from within the partial -->
-      <!-- Pass sidebarTree from our dashboardController  -->
-      <% renderTree(sidebarTree) %> 
+    <div class="folder-tree-section">
+      <h3 class="tree-root-toggle" id="root-folder-btn">
+        Folders
+      </h3>
+
+      <div id="main-folder-tree" class="hidden">
+        <!-- EJS Recursive Function Declaration -->
+        <% function renderTree(folders) { %>
+          <ul class="folder-tree">
+            <% folders.forEach(folder => { %>
+              <li>
+                <div class="tree-item" data-folder-id="<%= folder.id %>">
+                  <% if (folder.children.length > 0) { %>
+                    <span class="caret-icon">▶</span>
+                  <% } else { %>
+                    <span class="caret-spacer"></span>
+                  <% } %>
+                  <span class="folder-name">📁 <%= folder.name %></span>
+                </div>
+
+                <% if (folder.children.length > 0) { %>
+                  <div id="nested-<%= folder.id %>" class="nested-tree">
+                    <% renderTree(folder.children) %>
+                  </div>
+                <% } %>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+
+        <% renderTree(sidebarTree) %>
+      </div>
     </div>
-  </div>
   </nav>
 </aside>
