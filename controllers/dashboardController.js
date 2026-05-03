@@ -232,3 +232,44 @@ export const getStarredPage = async (req, res) => {
     res.redirect('/dashboard');
   }
 };
+
+
+// === API For Search Suggestions in Navbar ===
+export const searchItems = async (req, res) => {
+  try {
+    const { q } = req.query; // e.g., /api/search?q=myFile
+    const userId = req.user.id;
+
+    // If query is empty or too short, return empty arrays to save DB load
+    if (!q || q.trim().length < 2) {
+      return res.json({ files: [], folders: [] });
+    }
+
+    // Search Folders (mode: 'insensitive' makes it case-blind)
+    const folders = await prisma.folder.findMany({
+      where: {
+        userId: userId,
+        name: { contains: q, mode: 'insensitive' }
+      },
+      take: 5 // Limit to top 5 results
+    });
+
+    // Search Files
+    const files = await prisma.file.findMany({
+      where: {
+        userId: userId,
+        name: { contains: q, mode: 'insensitive' }
+      },
+      include: {
+        folder: true // We need the folder data so we know where to redirect!
+      },
+      take: 5
+    });
+
+    res.json({ files, folders });
+
+  } catch (error) {
+    console.error("Search API error:", error);
+    res.status(500).json({ error: "Search failed" });
+  }
+};

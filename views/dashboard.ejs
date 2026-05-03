@@ -38,6 +38,11 @@
     // === DOM ELEMENTS ===
     const dom = {
     layout: document.querySelector('.dashboard-layout'),
+    header: {
+      searchbar: document.querySelector('.search-bar'),
+      searchInput: document.getElementById('searchInput'),
+      searchResults: document.getElementById('searchResults')
+    },
     grid: document.querySelector('.item-grid'),
     modals: {
       upload: document.getElementById('uploadModal'),
@@ -76,6 +81,86 @@
 
   // === VISIBILITY TOGGLE HELPER ===
   const toggleUI = (el, force) => el.classList.toggle('active', force);
+
+
+  // === SEARCH FUNCTIONALITY ===
+  let debounceTimer;
+
+  if (dom.header.searchInput) {
+    dom.header.searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer); // Clear previous timer on each input
+      const query = e.target.value.trim();
+
+      // If query is too short, hide results and skip API call
+      if (query.length < 2) {
+        dom.header.searchResults.innerHTML = '';
+        dom.header.searchResults.style.display = 'none';
+        return;
+      }
+
+      // Add wait timer after user stops typing
+      debounceTimer = setTimeout(async () => {
+        try {
+          const response = await fetch(`/dashboard/api/search?q=${encodeURIComponent(query)}`);
+          const data = await response.json();
+
+          renderSearchResults(data);
+        } catch (err) {
+          console.error("Search error:", err);
+        }
+      }, 300); // Debounce delay
+    });
+  }
+
+  function renderSearchResults(data) {
+    dom.header.searchResults.innerHTML = ''; // Clear old results
+
+    if (data.files.length === 0 && data.folders.length === 0) {
+      dom.header.searchResults.innerHTML = '<div style="padding: 10px; color: #666;">No results found.</div>';
+      dom.header.searchResults.style.display = 'block';
+      return;
+    }
+
+    // Helper function to build result items
+    const buildItem = (item, type) => {
+      const div = document.createElement('div');
+      div.classList.add('search-result');
+      
+      // Clicking takes them to the directory
+      const targetUrl = item.folderId 
+        ? `/dashboard/${item.folderId}` // It's a file inside a folder
+        : (type === 'folder' ? `/dashboard/${item.id}` : `/dashboard`); // It's a folder, or a file in the root
+
+      div.innerHTML = `
+        <strong>${type === 'folder' ? '📁' : '📄'} ${item.name}</strong>
+        ${item.folder ? `<br><small style="color: #888;">in ${item.folder.name}</small>` : ''}
+      `;
+
+      // Navigate on click
+      div.addEventListener('click', () => {
+        window.location.href = targetUrl;
+      });
+
+      // // Simple hover effect
+      // div.addEventListener('mouseenter', () => div.style.backgroundColor = '#f5f5f5');
+      // div.addEventListener('mouseleave', () => div.style.backgroundColor = 'white');
+
+      return div;
+    };
+
+    data.folders.forEach(folder => dom.header.searchResults.appendChild(buildItem(folder, 'folder')));
+    data.files.forEach(file => dom.header.searchResults.appendChild(buildItem(file, 'file')));
+
+    dom.header.searchResults.style.display = 'block';
+  }
+
+
+  // Close search dropdown if user clicks outside of it
+  document.addEventListener('click', (e) => {
+    if (dom.header.searchInput && !dom.header.searchInput.contains(e.target) && !dom.header.searchResults.contains(e.target)) {
+      dom.header.searchResults.style.display = 'none';
+    }
+  });
 
   // === GRID ITEM BEHAVIOR ===
 
