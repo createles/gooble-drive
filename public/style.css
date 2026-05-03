@@ -72,10 +72,28 @@ a {
   z-index: 10;
 }
 
-.logo-placeholder {
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* The spacing between the logo and the text */
+  text-decoration: none; /* Removes link underline */
+  color: var(--text-muted);
+  transition: opacity 0.2s;
+}
+
+.brand-container:hover {
+  opacity: 0.8; /* Slight visual feedback when hovering over the logo */
+}
+
+.brand-icon {
+  width: 32px; /* Adjust this value to make your SVG bigger or smaller */
+  height: 32px;
+  object-fit: contain; /* Ensures the SVG doesn't stretch weirdly */
+}
+
+.brand-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-muted);
 }
 
 .search-bar input {
