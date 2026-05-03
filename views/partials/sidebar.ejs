@@ -1,8 +1,8 @@
 <aside class="app-sidebar">
   <nav class="side-nav">
-    <a href="/dashboard" class="nav-item active">Home</a>
-    <a href="/dashboard/recent" class="nav-item">Recent</a>
-    <a href="/dashboard/starred" class="nav-item">Starred</a>
+    <a href="/dashboard" class="nav-item <%= viewMode === 'dashboard' ? 'active' : '' %>">Home</a>
+    <a href="/dashboard/recent" class="nav-item <%= viewMode === 'recent' ? 'active' : '' %>">Recent</a>
+    <a href="/dashboard/starred" class="nav-item <%= viewMode === 'starred' ? 'active' : '' %>">Starred</a>
     <div class="folder-tree-section">
     <h3 class="tree-root-toggle" id="root-folder-btn">
       Folders
