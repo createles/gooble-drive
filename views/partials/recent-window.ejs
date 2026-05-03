@@ -4,7 +4,7 @@
 </div>
 
 <!-- Conditional Rendering based on database contents -->
-<% if (categorizedFiles && Object.keys(categorizedFiles).length !== 0) { %>
+<% if (categorizedFiles && !Object.keys(categorizedFiles).length === 0) { %>
 
   <div class="item-grid">
         <!-- Loop over files, sectioned by activity date -->
