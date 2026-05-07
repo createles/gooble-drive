@@ -18,6 +18,7 @@
   <%- include('partials/options-menu.ejs') %>
   <%- include('partials/share-modal.ejs') %>
   <%- include('partials/move-modal.ejs') %>
+  <%- include('partials/log-out-modal.ejs') %>
 
   <% if (viewMode !== 'recent') { %>
     <%- include('partials/add-btn.ejs') %>
@@ -45,14 +46,16 @@
     header: {
       searchbar: document.querySelector('.search-bar'),
       searchInput: document.getElementById('searchInput'),
-      searchResults: document.getElementById('searchResults')
+      searchResults: document.getElementById('searchResults'),
+      avatar: document.querySelector('.avatar')
     },
     grid: document.querySelector('.item-grid'),
     modals: {
       upload: document.getElementById('uploadModal'),
       details: document.getElementById('detailsModal'),
       share: document.getElementById('shareModal'),
-      move: document.getElementById('moveModal')
+      move: document.getElementById('moveModal'),
+      logout: document.getElementById('logoutModal')
     },
     upload: {
       fileInput: document.getElementById('file'),
@@ -165,6 +168,12 @@
       dom.header.searchResults.style.display = 'none';
     }
   });
+
+
+  // === LOGOUT MODAL ===
+  dom.header.avatar?.addEventListener('click', () => {
+    toggleUI(dom.modals.logout, true);
+  })
 
   // === GRID ITEM BEHAVIOR ===
 
