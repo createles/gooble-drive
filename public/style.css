@@ -240,6 +240,36 @@ a {
 }
 
 /* =========================================
+   LOGOUT MODAL
+   ========================================= */
+
+  #logoutModal p {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  }
+
+  #logoutModal .modal-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  #logoutModal button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.35rem 0.8rem;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  }
+
+  #logoutModal button:hover {
+    background-color: #0842a0;
+  }
+
+/* =========================================
    SIDEBAR
    ========================================= */
 
