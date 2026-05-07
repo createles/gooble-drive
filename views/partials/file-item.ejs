@@ -3,7 +3,9 @@
 <div 
   class="grid-item"
   data-type="file"
-  data-id="<%= file.id %>" data-name="<%= file.name %>"
+  data-id="<%= file.id %>"
+  data-name="<%= file.name %>"
+  data-url="<%= file.url%>"
   data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
   data-date="<%= file.uploadTime.toDateString() %>"
   data-parent-id="<%= file.folderId || '' %>">

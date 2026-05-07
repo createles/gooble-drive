@@ -198,9 +198,25 @@
   // Double click allows navigating into a folder
   dom.grid?.addEventListener('dblclick', (e) => {
     const item = e.target.closest('.grid-item');
-    const destination = item?.getAttribute('href');
-    // "Go" navigation on double click
-    if (destination) window.location.href = destination;
+
+    if (!item) return;
+
+    const itemType = item.dataset.type;
+
+    if (itemType === 'folder') {
+      const destination = item?.getAttribute('href');
+      // "Go" navigation on double click
+      if (destination) window.location.href = destination;
+    
+    // Open files in a new tab
+    } else if (itemType === 'file') {
+      const fileUrl = item.dataset.url;
+
+      if (fileUrl) {
+      // open(url, target) where '_blank' opens a new tab
+      window.open(fileUrl, '_blank');
+      }
+    }
   });
 
   // === OPTIONS MENU LOGIC ===
