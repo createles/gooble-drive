@@ -60,3 +60,12 @@ export const postLogin = passport.authenticate('local', {
   failureRedirect: '/login',
   failureFlash: true
 });
+
+
+export const postLogout = (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    req.flash('success', 'You have been logged out.');
+    res.redirect('/login');
+  });
+};

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getSignup, postSignup, getLogin, postLogin } from "../controllers/userController.js";
+import { getSignup, postSignup, getLogin, postLogin, postLogout } from "../controllers/userController.js";
 
 const userRouter = Router();
 
@@ -11,5 +11,8 @@ userRouter.post('/signup', postSignup)
 userRouter.get('/login', getLogin);
 // Calls passport authenticate with proper redirects
 userRouter.post('/login', postLogin);
+
+// Logout Route
+userRouter.post('/logout', postLogout);
 
 export default userRouter;
