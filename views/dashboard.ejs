@@ -692,5 +692,9 @@
   });
 
   </script>
+  <% if (showTutorial) { %>
+  <%- include('partials/tutorial-modal.ejs') %>
+    <script src="/scripts/tutorial.js"></script>
+  <% } %>
 </body>
 </html>
