@@ -185,13 +185,17 @@ export const deleteFile = async (req, res) => {
       where: { path: file.path }
     });
 
-    // Delete from Supabase Storage first
-    if (pathCount === 1) { // Only delete from storage if this is the last record with that path  
-      const { error: storageError } = await supabase.storage
-        .from('uploads')
-        .remove([file.path]);
+    // GUARD: Prevents Tutorial files from being deleted from Supabase
+    if (!file.path.startsWith('tutorial-assets/')) {
+      // -- Non-Tutorial Files --
+      // Delete from Supabase Storage first
+      if (pathCount === 1) { // Only delete from storage if this is the last record with that path  
+        const { error: storageError } = await supabase.storage
+          .from('uploads')
+          .remove([file.path]);
 
-      if (storageError) throw storageError;
+        if (storageError) throw storageError;
+      }
     }
 
     // Delete from Database
