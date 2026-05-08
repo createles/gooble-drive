@@ -18,6 +18,12 @@ export const getDashboard = async (req, res) => {
     const folderId = req.params.folderId ? parseInt(req.params.folderId) : null
     const userId = req.user.id;
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id
+      }
+    });
+
     // Fetch all folders for sidebar
     const allFolders = await prisma.folder.findMany({
       where: { userId: req.user.id },
@@ -57,6 +63,7 @@ export const getDashboard = async (req, res) => {
       title: currentFolder ? currentFolder.name : "My Drive",
       sidebarTree: folderTree, // to populate sidebar nav
       viewMode: 'dashboard',
+      showTutorial: user.showTutorial, // Flag for showing the tutorial
       currentFolder, // Useful for breadcrumbs
       folders,
       files,
