@@ -985,6 +985,52 @@ a {
 }
 
 /* =========================================
+   TUTORIAL VIEW & MODAL
+   ========================================= */
+
+/* Dark Overlay */
+.tutorial-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100svw; height: 100svh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+  pointer-events: none; /* Allows clicking the highlighted item */
+}
+
+/* The "Spotlight" effect */
+.tutorial-spotlight {
+  z-index: 9001 !important;
+  border: 2px solid var(--primary-color);
+  background: var(--bg-color) !important;
+  border-radius: 8px;
+}
+
+.tutorial-modal {
+  position: fixed;
+  z-index: 9000;
+  background: var(--bg-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tutorial-modal.active,
+.tutorial-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+/* =========================================
    PUBLIC SHARED VIEW
    ========================================= */
 
