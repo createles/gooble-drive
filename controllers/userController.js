@@ -26,12 +26,74 @@ export const postSignup = async (req, res, next) => {
     // hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // insert user into DB
-    const user = await prisma.user.create({
-      data: {
-        username: username,
-        password: hashedPassword,
+    // Define metadata for tutorial files
+    const TUTORIAL_ASSETS = [
+      {
+        name: 'Welcome to Gooble Drive.txt',
+        path: 'tutorial-assets/Welcome to Gooble Drive.txt',
+        url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/Welcome%20to%20Gooble%20Drive.txt',
+        size: '0.322 KB'
       },
+      {
+        name: 'El Nido.jpg',
+        path: 'tutorial-assets/El Nido.jpg',
+        url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/El%20Nido.jpg',
+        size: '1010 KB',
+      },
+      {
+        name: 'awesome.jpg',
+        path: 'tutorial-assets/awesome.jpg',
+        url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/awesome.jpg',
+        size: '1720 KB',
+      },
+      {
+        name: 'super friends.jpg',
+        path: 'tutorial-assets/super friends.jpg',
+        url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/super%20friends.jpg',
+        size: '1760 KB',
+      }
+    ]
+    
+    // Prisma Transaction to create user
+    // and populate dashboard with tutorial folder
+    await prisma.$transaction(async (tx) => {
+      
+      // insert user into DB
+      const newUser = await tx.user.create({
+        data: {
+          username: username,
+          password: hashedPassword,
+        },
+      });
+
+      // Create "Getting Started" Folder
+      const gettingStarted = await tx.folder.create({
+        data: {
+          name: 'Getting Started',
+          userId: newUser.id,
+        },
+      });
+
+      // Create "Close ups" Folder
+      const closeUps = await tx.folder.create({
+        data: {
+          name: 'Close ups',
+          userId: newUser.id,
+          parentId: gettingStarted.id,
+        }
+      });
+
+      // Link assets to new user in database
+      const starterRecords = TUTORIAL_ASSETS.map(asset => ({
+        ...asset,
+        userId: newUser.id,
+        folderId: asset.name === 'awesome.jpg' || asset.name === 'super friends.jpg' ? closeUps.id : gettingStarted.id,
+        isStarred: asset.name.includes('Welcome') // Star the Welcome file
+      }));
+
+      await tx.file.createMany({
+        data: starterRecords
+      });
     });
 
     // redirect to login page on success
