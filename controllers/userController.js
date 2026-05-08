@@ -32,25 +32,25 @@ export const postSignup = async (req, res, next) => {
         name: 'Welcome to Gooble Drive.txt',
         path: 'tutorial-assets/Welcome to Gooble Drive.txt',
         url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/Welcome%20to%20Gooble%20Drive.txt',
-        size: '0.322 KB'
+        size: 0.322,
       },
       {
         name: 'El Nido.jpg',
         path: 'tutorial-assets/El Nido.jpg',
         url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/El%20Nido.jpg',
-        size: '1010 KB',
+        size: 1010,
       },
       {
         name: 'awesome.jpg',
         path: 'tutorial-assets/awesome.jpg',
         url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/awesome.jpg',
-        size: '1720 KB',
+        size: 1720,
       },
       {
         name: 'super friends.jpg',
         path: 'tutorial-assets/super friends.jpg',
         url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/super%20friends.jpg',
-        size: '1760 KB',
+        size: 1760,
       }
     ]
     
