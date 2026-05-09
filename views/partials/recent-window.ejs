@@ -4,7 +4,7 @@
 </div>
 
 <!-- Conditional Rendering based on database contents -->
-<% if (categorizedFiles && !Object.keys(categorizedFiles).length === 0) { %>
+<% if (categorizedFiles && Object.keys(categorizedFiles).length > 0) { %>
 
   <div class="item-grid">
         <!-- Loop over files, sectioned by activity date -->
@@ -18,14 +18,14 @@
           <% if (categorizedFiles.pastWeek.length > 0) { %>
           <h3 class="grid-section-header"> In the past week </h3>
             <% categorizedFiles.pastWeek.forEach(file=> { %>
-              <%- include('file-item.ejs'), { file } %>
+              <%- include('file-item.ejs', { file }) %>
             <% }) %>
           <% } %>
 
           <% if (categorizedFiles.pastMonth.length > 0) { %>
           <h3 class="grid-section-header"> In the past month </h3>
             <% categorizedFiles.pastMonth.forEach(file=> { %>
-              <%- include('file-item.ejs'), { file } %>
+              <%- include('file-item.ejs', { file }) %>
             <% }) %>
           <% } %>
   </div>
