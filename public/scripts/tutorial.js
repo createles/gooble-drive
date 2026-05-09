@@ -67,28 +67,24 @@ function renderTutorialStep() {
     targetEl.classList.add('tutorial-spotlight');
     targetEl.style.opacity = '1';
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    positionModal(modal, targetEl);
-  } else {
-    modal.style.position = 'fixed';
-    modal.style.top = '50%';
-    modal.style.left = '50%';
-    modal.style.transform = 'translate(-50%, -50%)';
   }
+
+  positionModal(modal, targetEl);
 
   if (step === tutorialSteps[1]) {
     nextBtn.style.display = 'none';
   }
 
-  if (step === tutorialSteps[3]) {
+  if (step === tutorialSteps[3] && dom?.options?.menu) {
     dom.options.menu.style.zIndex = '9002'; // Ensure options menu appears above modal
     dom.options.menu.style.top = '0';
     dom.options.menu.style.left = '0';
   }
 
-  if (step === tutorialSteps[5]) {
+  if (step === tutorialSteps[5] && dom?.modals?.upload) {
     dom.modals.upload.style.zIndex = '9002'; // Ensure upload modal appears above tutorial
   }
-  
+
   modal.classList.add('active');
   overlay.classList.add('active');
 }
@@ -124,11 +120,46 @@ function autoAdvanceAfterFolderNav() {
 
 // Position modal next to target element
 function positionModal(modal, target) {
-  const rect = target.getBoundingClientRect();
-  const modalWidth = 300; // Matches CSS
+  if (!modal) return;
+
+  // for mobile screens, place the modal above the floating add button if it exists
+  if (window.innerWidth <= 767) {
+    modal.style.position = 'fixed';
+    modal.style.top = 'auto';
+    modal.style.left = '50%';
+    modal.style.transform = 'translateX(-50%)';
+    modal.style.width = 'min(calc(100vw - 32px), 340px)';
+    modal.style.maxWidth = '100%';
+    modal.style.right = 'auto';
+
+    const floatingBtn = document.querySelector('.floating-add-btn');
+    if (floatingBtn) {
+      const buttonRect = floatingBtn.getBoundingClientRect();
+      const gap = 12;
+      const bottomOffset = Math.max(20, window.innerHeight - buttonRect.top + gap);
+      modal.style.bottom = `${bottomOffset}px`;
+    } else {
+      modal.style.bottom = '20px';
+    }
+
+    return;
+  }
+
+  const rect = target ? target.getBoundingClientRect() : null;
+  const modalWidth = modal.getBoundingClientRect().width || 300;
   const modalHeight = modal.offsetHeight || modal.getBoundingClientRect().height;
   const padding = 15;
   const minMargin = 20;
+
+  if (!rect) {
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.width = '300px';
+    modal.style.maxWidth = '100%';
+    return;
+  }
 
   modal.style.position = 'absolute';
   modal.style.transform = 'none';
