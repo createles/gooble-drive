@@ -198,6 +198,7 @@ export const getRecentPage = async (req, res) => {
     res.render('dashboard', { 
         title: 'Gooble Drive - Recent Files',
         sidebarTree: folderTree, // to populate sidebar nav
+        showTutorial: false, // Don't show tutorial on Recent page
         viewMode: 'recent',
         currentFolder: null,
         categorizedFiles: categorizedFiles,
@@ -249,6 +250,7 @@ export const getStarredPage = async (req, res) => {
     res.render('dashboard', { 
         title: 'Gooble Drive - Starred',
         sidebarTree: folderTree, 
+        showTutorial: false, // Don't show tutorial on Starred page
         viewMode: 'starred', // Renders starred-window.ejs
         currentFolder: null, 
         folders: starredFolders,
