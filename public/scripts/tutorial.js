@@ -59,6 +59,7 @@ function renderTutorialStep() {
 
   if (targetEl) {
     targetEl.classList.add('tutorial-spotlight');
+    targetEl.style.opacity = '1';
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     positionModal(modal, targetEl);
   } else {
@@ -68,6 +69,15 @@ function renderTutorialStep() {
     modal.style.transform = 'translate(-50%, -50%)';
   }
 
+  if (step === tutorialSteps[1]) {
+    nextBtn.style.display = 'none';
+  }
+
+  if (step === tutorialSteps[3]) {
+    dom.options.menu.style.zIndex = '9002'; // Ensure options menu appears above modal
+    dom.options.menu.style.top = '0';
+    dom.options.menu.style.left = '0';
+  }
   modal.classList.add('active');
   overlay.classList.add('active');
 }
