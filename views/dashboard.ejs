@@ -461,13 +461,14 @@
     const id = dom.options.menu.dataset.activeId;
     if (!id) return;
 
+    let response;
     try {
       if (dom.options.menu.dataset.activeType === 'folder') {
         const confirmCopy = confirm("Copying a folder will also copy all of its contents. Do you want to proceed?");
         
         if (!confirmCopy) return;
 
-        const response = await fetch(`/folders/${id}/copy`, {
+        response = await fetch(`/folders/${id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -478,7 +479,7 @@
         
         if (!confirmCopy) return;
 
-        const response = await fetch(`/files/${id}/copy`, {
+        response = await fetch(`/files/${id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
