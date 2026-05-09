@@ -29,6 +29,12 @@ const tutorialSteps = [
     expectedEvent: 'click'
   },
   {
+    title: "Upload your own Files and Folders",
+    message: "Use the 'Upload' button to add your own files and folders to Gooble Drive.",
+    target: '#openUploadModal',
+    expectedEvent: 'click'
+  },
+  {
     title: "You're ready to go!",
     message: "That's it! You're ready to start managing your own files. Happy Goobling!",
     target: null,
@@ -78,6 +84,11 @@ function renderTutorialStep() {
     dom.options.menu.style.top = '0';
     dom.options.menu.style.left = '0';
   }
+
+  if (step === tutorialSteps[5]) {
+    dom.modals.upload.style.zIndex = '9002'; // Ensure upload modal appears above tutorial
+  }
+  
   modal.classList.add('active');
   overlay.classList.add('active');
 }
@@ -115,15 +126,35 @@ function autoAdvanceAfterFolderNav() {
 function positionModal(modal, target) {
   const rect = target.getBoundingClientRect();
   const modalWidth = 300; // Matches CSS
+  const modalHeight = modal.offsetHeight || modal.getBoundingClientRect().height;
+  const padding = 15;
+  const minMargin = 20;
 
   modal.style.position = 'absolute';
-  modal.style.top = `${window.scrollY + rect.bottom + 15}px`;
-  modal.style.left = `${rect.left}px`;
   modal.style.transform = 'none';
 
-  if (rect.left + modalWidth > window.innerWidth) {
-    modal.style.left = `${window.innerWidth - modalWidth - 20}px`;
+  let top = window.scrollY + rect.bottom + padding;
+  const bottomLimit = window.scrollY + window.innerHeight - modalHeight - minMargin;
+
+  if (top > bottomLimit) {
+    top = window.scrollY + rect.top - modalHeight - padding;
   }
+
+  if (top < window.scrollY + minMargin) {
+    top = window.scrollY + minMargin;
+  }
+
+  let left = rect.left;
+  const rightLimit = window.innerWidth - modalWidth - minMargin;
+
+  if (left < minMargin) {
+    left = minMargin;
+  } else if (left > rightLimit) {
+    left = rightLimit;
+  }
+
+  modal.style.top = `${top}px`;
+  modal.style.left = `${left}px`;
 }
 
 function handleNext() {
