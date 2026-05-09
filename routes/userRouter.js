@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getSignup, postSignup, getLogin, postLogin, postLogout } from "../controllers/userController.js";
 import { isAuth } from "../middleware/authMiddleware.js";
+import { prisma } from "../lib/prisma.js"
 
 const userRouter = Router();
 
