@@ -6,7 +6,8 @@
   data-id="<%= file.id %>"
   data-name="<%= file.name %>"
   data-url="<%= file.url%>"
-  data-size="<%= (file.size / 1024).toFixed(1) %> KB" 
+  <% const sizeInKB = file.size / 1024; const sizeInMB = file.size / 1024 / 1024; const sizeLabel = sizeInMB >= 1 ? `${sizeInMB.toFixed(1)} MB` : `${sizeInKB.toFixed(1)} KB`; %>
+  data-size="<%= sizeLabel %>" 
   data-date="<%= file.uploadTime.toDateString() %>"
   data-parent-id="<%= file.folderId || '' %>">
   <button class="options-btn">&#8942;</button>
@@ -20,7 +21,7 @@
         <%= ext.toUpperCase().replace('.', '' ) %>
       </div>
       <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
-        <%= (file.size / 1024).toFixed(1) %> KB
+        <%= sizeLabel %>
       </div>
   </div>
   <% if (viewMode === 'recent') { %>
