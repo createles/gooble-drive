@@ -1,49 +1,48 @@
 import { Router } from "express";
 import userRouter from "./userRouter.js";
-import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js"; // Updated import path
-import { getDashboard, getSharedItemPage, postCreateFolder, postCopyFolder } from "../controllers/dashboardController.js";
-import { handleUpload, upload } from "../controllers/uploadController.js";
 import dashboardRouter from "./dashboardRouter.js";
-import { copyFile, deleteFile, deleteFolder, generateShareLink, getFileMetadata, getSharedItemMetadata, getUserFolders, moveFile, moveFolder, renameFile, renameFolder, startDownload, toggleStar, validatePublicShare } from "../controllers/fileController.js";
-import multer from "multer";
+import { isAuth, isLoggedIn } from "../middleware/authMiddleware.js";
+import { getSharedItemPage, postCreateFolder, postCopyFolder } from "../controllers/dashboardController.js";
+import { handleUpload, handleSingleUpload } from "../controllers/uploadController.js";
+import { 
+  copyFile, 
+  deleteFile, 
+  deleteFolder, 
+  generateShareLink, 
+  getFileMetadata, 
+  getSharedItemMetadata, 
+  getUserFolders, 
+  moveFile, 
+  moveFolder, 
+  renameFile, 
+  renameFolder, 
+  startDownload, 
+  toggleStar, 
+  validatePublicShare 
+} from "../controllers/fileController.js";
 
 const appRouter = Router();
 
 // Check for login status: yes -> dashboard // no -> homepage
 appRouter.get('/', isLoggedIn, (req, res) => {
   res.render('homepage', {
-      title: 'Gooble Drive - Welcome'
+    title: 'Gooble Drive - Welcome'
   });
-})
+});
 
 appRouter.use('/', userRouter);
 appRouter.use('/dashboard', dashboardRouter);
 
+// File Upload Route
+appRouter.post('/upload', isAuth, handleSingleUpload, handleUpload);
 
-appRouter.post('/upload', isAuth, (req, res, next) => {
-  // Capture any errors from upload.single(), pass to a middleware fn
-  upload.single('file')(req, res, (err) => { 
-    if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        req.flash("error", "File is too large! Max limit is 10MB.");
-        return res.redirect(req.body.folderId ? `/dashboard/${req.body.folderId}` : "/dashboard");
-      }
-      req.flash("error", `Upload Error: ${err.message}`);
-      return res.redirect("/dashboard");
-    } else if (err) {
-      return next(err);
-    }
-    // If no multer error, proceed to the controller
-    next();
-  });
-}, handleUpload);
-
-
+// Download Route
 appRouter.get('/download/:fileId', getFileMetadata, startDownload);
 
+// Folder Creation Route
 appRouter.post('/folders/create', isAuth, postCreateFolder);
 
-// Route for Fetch API call to get shareable link
+// Share Link Generation Route
 appRouter.post('/share', isAuth, generateShareLink);
 
 // Delete routes
@@ -63,11 +62,11 @@ appRouter.patch('/folders/:folderId/move', isAuth, moveFolder);
 appRouter.post('/files/:fileId/copy', isAuth, copyFile);
 appRouter.post('/folders/:folderId/copy', isAuth, postCopyFolder);
 
-// Star Toggle Route
+// Star Toggle Routes
 appRouter.patch('/files/:itemId/star', isAuth, toggleStar);
 appRouter.patch('/folders/:itemId/star', isAuth, toggleStar);
 
-// Public Routes
+// Public Share Routes
 appRouter.get('/share/:shareId', getSharedItemMetadata, getSharedItemPage);
 appRouter.get('/public/download/:shareId', validatePublicShare, startDownload);
 
