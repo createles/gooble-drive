@@ -13,58 +13,44 @@ const buildFolderTree = (folders, parentId = null) => {
 
 export const getDashboard = async (req, res) => {
   try {
-    // Determine current folder location
-    // Convert param to Int as Prisma uses Int for IDs
-    const folderId = req.params.folderId ? parseInt(req.params.folderId) : null
+    const folderId = req.params.folderId ? parseInt(req.params.folderId, 10) : null;
     const userId = req.user.id;
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.user.id
-      }
-    });
+    // Fetch data concurrently for improved responsiveness
+    const [allFolders, currentFolder, folders, files] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId },
+        orderBy: { name: 'asc' }
+      }),
+      folderId
+        ? prisma.folder.findFirst({
+            where: { id: folderId, userId }
+          })
+        : Promise.resolve(null),
+      prisma.folder.findMany({
+        where: { userId, parentId: folderId },
+        orderBy: { name: 'asc' }
+      }),
+      prisma.file.findMany({
+        where: { userId, folderId: folderId },
+        orderBy: { uploadTime: 'desc' }
+      })
+    ]);
 
-    // Fetch all folders for sidebar
-    const allFolders = await prisma.folder.findMany({
-      where: { userId: req.user.id },
-      orderBy: { name: 'asc' }
-    });
+    // If a folder ID was passed but not found or unauthorized for this user
+    if (folderId && !currentFolder) {
+      req.flash("error", "Folder not found or unauthorized.");
+      return res.redirect("/dashboard");
+    }
 
     const folderTree = buildFolderTree(allFolders);
 
-    // Fetch current folder details
-    let currentFolder = null;
-    if (folderId) {
-      currentFolder = await prisma.folder.findUnique({
-        where: { id: folderId }
-      });
-    }
-    
-    // Fetch sub-folders
-    const folders = await prisma.folder.findMany({
-      where: {
-        userId: userId,
-        parentId: folderId,
-      },
-      orderBy: { name: 'asc' }
-    });
-
-    // Fetch files
-    const files = await prisma.file.findMany({
-      where: {
-        userId: userId,
-        folderId: folderId,
-      },
-      orderBy: { uploadTime: 'desc' }
-    });
-
-    // 5. Render the view with the fetched data
     res.render("dashboard", {
       title: currentFolder ? currentFolder.name : "My Drive",
-      sidebarTree: folderTree, // to populate sidebar nav
+      sidebarTree: folderTree,
       viewMode: 'dashboard',
-      showTutorial: user.showTutorial, // Flag for showing the tutorial
-      currentFolder, // Useful for breadcrumbs
+      showTutorial: req.user.showTutorial,
+      currentFolder,
       folders,
       files,
       isPublic: false
@@ -74,7 +60,7 @@ export const getDashboard = async (req, res) => {
     console.error("Dashboard loading error:", err);
     res.status(500).send("Error loading dashboard");
   }
-}
+};
 
 export const postCreateFolder = async (req, res, next) => {
   // Grab name and parentId from form
@@ -161,44 +147,39 @@ export const getRecentPage = async (req, res) => {
     const userId = req.user.id;
     const now = new Date();
 
-    // Fetch all folders for sidebar
-    const allFolders = await prisma.folder.findMany({
-      where: { userId: req.user.id },
-      orderBy: { name: 'asc' }
-    });
-    
-    const folderTree = buildFolderTree(allFolders);
-
-    // Define the time thresholds
     const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
     const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
     const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
 
-    // Fetch all files from the past month in a single query
-    const recentFiles = await prisma.file.findMany({
-      where: {
-        userId: userId,
-        updatedAt: { gte: oneMonthAgo } // Only fetch files updated in the last 30 days (gte = Greater than or Equal to)
-      },
-      include: {
-        folder: true
-      },
-      orderBy: { updatedAt: 'desc' }
-    });
+    const [allFolders, recentFiles] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId },
+        orderBy: { name: 'asc' }
+      }),
+      prisma.file.findMany({
+        where: {
+          userId,
+          updatedAt: { gte: oneMonthAgo }
+        },
+        include: {
+          folder: true
+        },
+        orderBy: { updatedAt: 'desc' }
+      })
+    ]);
+    
+    const folderTree = buildFolderTree(allFolders);
 
-    // Group the files into buckets by filtering
     const categorizedFiles = {
       today: recentFiles.filter(file => file.updatedAt >= oneDayAgo),
       pastWeek: recentFiles.filter(file => file.updatedAt >= oneWeekAgo && file.updatedAt < oneDayAgo),
-      pastMonth: recentFiles.filter(file => file.updatedAt < oneWeekAgo) // Anything left over
+      pastMonth: recentFiles.filter(file => file.updatedAt < oneWeekAgo)
     };
 
-
-    // Render dashboard view with 'Recent' flag
     res.render('dashboard', { 
         title: 'Gooble Drive - Recent Files',
-        sidebarTree: folderTree, // to populate sidebar nav
-        showTutorial: false, // Don't show tutorial on Recent page
+        sidebarTree: folderTree,
+        showTutorial: false,
         viewMode: 'recent',
         currentFolder: null,
         categorizedFiles: categorizedFiles,
@@ -217,41 +198,37 @@ export const getStarredPage = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Fetch all folders for Sidebar Tree
-    const allFolders = await prisma.folder.findMany({
-      where: { userId: userId },
-      orderBy: { name: 'asc' }
-    });
+    const [allFolders, starredFolders, starredFiles] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId },
+        orderBy: { name: 'asc' }
+      }),
+      prisma.folder.findMany({
+        where: {
+          userId,
+          isStarred: true
+        },
+        orderBy: { name: 'asc' }
+      }),
+      prisma.file.findMany({
+        where: {
+          userId,
+          isStarred: true
+        },
+        include: {
+          folder: true
+        },
+        orderBy: { name: 'asc' } 
+      })
+    ]);
 
     const folderTree = buildFolderTree(allFolders);
 
-    // Fetch only Starred Folders
-    const starredFolders = await prisma.folder.findMany({
-      where: {
-        userId: userId,
-        isStarred: true
-      },
-      orderBy: { name: 'asc' } // Alphabetical order is usually best for starred
-    });
-
-    // Fetch only Starred Files
-    const starredFiles = await prisma.file.findMany({
-      where: {
-        userId: userId,
-        isStarred: true
-      },
-      include: {
-        folder: true // Show location badge under file
-      },
-      orderBy: { name: 'asc' } 
-    });
-
-    // Render the dashboard view with the 'starred' viewMode
     res.render('dashboard', { 
         title: 'Gooble Drive - Starred',
         sidebarTree: folderTree, 
-        showTutorial: false, // Don't show tutorial on Starred page
-        viewMode: 'starred', // Renders starred-window.ejs
+        showTutorial: false,
+        viewMode: 'starred',
         currentFolder: null, 
         folders: starredFolders,
         files: starredFiles,
