@@ -85,8 +85,8 @@ export const generateShareLink = async (req, res) => {
     // Create the share record
     const sharedItem = await prisma.share.create({
       data: {
-        fileId: parseInt(itemType === 'file' ? itemId : null), // Only set fileId if it's a file
-        folderId: parseInt(itemType === 'folder' ? itemId : null), // Only set folderId if it's a folder
+        fileId: itemType === 'file' ? parseInt(itemId) : null, // Only set fileId if it's a file **FIXED: null being parsed into NaN
+        folderId: itemType === 'folder' ? parseInt(itemId) : null, // Only set folderId if it's a folder
         expiresAt: expiresAt
       }
     });
@@ -231,9 +231,9 @@ const getAllNestedFileData = async (folderId) => {
 
   /// Recursively call this function for each sub-folder
   for (const folder of subFolders) {
-    const nestedPaths = await getAllNestedFilePaths(folder.id);
-    fileIds.push(...nestedPaths.fileIds);
-    paths.push(...nestedPaths);
+    const nestedData = await getAllNestedFileData(folder.id);
+    fileIds.push(...nestedData.fileIds);
+    paths.push(...nestedData.paths);
   }
 
   return { fileIds, paths }; // Return an object with both fileIds and paths
