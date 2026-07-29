@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gooble Drive - <%= title %></title>
+  <title>Gobble Drive - <%= title %></title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('gobble_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&family=Shantell+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="/style.css"> 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -47,7 +59,7 @@
       searchbar: document.querySelector('.search-bar'),
       searchInput: document.getElementById('searchInput'),
       searchResults: document.getElementById('searchResults'),
-      avatar: document.querySelector('.avatar')
+      avatar: document.querySelector('.user-profile-pill') || document.querySelector('.avatar')
     },
     grid: document.querySelector('.item-grid'),
     modals: {
@@ -127,11 +139,16 @@
     });
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function renderSearchResults(data) {
     dom.header.searchResults.innerHTML = ''; // Clear old results
 
     if (data.files.length === 0 && data.folders.length === 0) {
-      dom.header.searchResults.innerHTML = '<div style="padding: 10px; color: #666;">No results found.</div>';
+      dom.header.searchResults.innerHTML = '<div class="search-no-results">No results found.</div>';
       dom.header.searchResults.style.display = 'block';
       return;
     }
@@ -139,26 +156,27 @@
     // Helper function to build result items
     const buildItem = (item, type) => {
       const div = document.createElement('div');
-      div.classList.add('search-result');
+      div.classList.add('search-result-item');
       
-      // Clicking takes them to the directory
       const targetUrl = item.folderId 
-        ? `/dashboard/${item.folderId}` // It's a file inside a folder
-        : (type === 'folder' ? `/dashboard/${item.id}` : `/dashboard`); // It's a folder, or a file in the root
+        ? `/dashboard/${item.folderId}` 
+        : (type === 'folder' ? `/dashboard/${item.id}` : `/dashboard`);
+
+      const iconClass = type === 'folder' ? 'ph-folder' : 'ph-file-text';
 
       div.innerHTML = `
-        <strong>${type === 'folder' ? '📁' : '📄'} ${item.name}</strong>
-        ${item.folder ? `<br><small style="color: #888;">in ${item.folder.name}</small>` : ''}
+        <div class="search-result-icon-box">
+          <i class="ph-duotone ${iconClass}"></i>
+        </div>
+        <div class="search-result-details">
+          <span class="search-result-name">${escapeHtml(item.name)}</span>
+          ${item.folder ? `<span class="search-result-sub">in ${escapeHtml(item.folder.name)}</span>` : ''}
+        </div>
       `;
 
-      // Navigate on click
       div.addEventListener('click', () => {
         window.location.href = targetUrl;
       });
-
-      // // Simple hover effect
-      // div.addEventListener('mouseenter', () => div.style.backgroundColor = '#f5f5f5');
-      // div.addEventListener('mouseleave', () => div.style.backgroundColor = 'white');
 
       return div;
     };
@@ -197,39 +215,37 @@
     const item = e.target.closest('.grid-item');
     if (!item) return;
 
-    // FIX: "Stop" navigation on single click for folders
+    if (e.target.closest('.options-btn') || e.target.closest('.star-toggle-btn')) return;
+
     if (item.tagName === 'A') e.preventDefault();
 
     syncDetailsPane(item);
   });
 
-  // Double click allows navigating into a folder
+  // Double click allows navigating into a folder or opening a file in a new tab
   dom.grid?.addEventListener('dblclick', (e) => {
     const item = e.target.closest('.grid-item');
-
     if (!item) return;
+
+    if (e.target.closest('.options-btn') || e.target.closest('.star-toggle-btn')) return;
 
     const itemType = item.dataset.type;
 
     if (itemType === 'folder') {
       const destination = item?.getAttribute('href');
-      // "Go" navigation on double click
       if (destination) window.location.href = destination;
     
-    // Open files in a new tab
     } else if (itemType === 'file') {
-      const fileUrl = item.dataset.url;
-
+      const fileUrl = item.dataset.url || `/download/${item.dataset.id}`;
       if (fileUrl) {
-      // open(url, target) where '_blank' opens a new tab
-      window.open(fileUrl, '_blank');
+        window.open(fileUrl, '_blank');
       }
     }
   });
 
   // === OPTIONS MENU LOGIC ===
-  const showOptionsMenu = (e) => {
-    const item = e.target.closest('.grid-item');
+  const showOptionsMenu = (e, item) => {
+    if (!item) return;
     const itemId = item.dataset.id;
     const itemType = item.dataset.type;
     const itemName = item.dataset.name;
@@ -240,24 +256,44 @@
     e.preventDefault();
     e.stopPropagation();
 
-    // Stamp ID onto options menu
     dom.options.menu.dataset.activeId = itemId;
     dom.options.menu.dataset.activeType = itemType;
     dom.options.menu.dataset.activeName = itemName;
     dom.options.menu.dataset.parentFolder = parentFolder;
 
-    // Update Menu Buttons
-    dom.options.download.href = `/download/${itemId}`;
+    if (dom.options.download) {
+      dom.options.download.href = `/download/${itemId}`;
+    }
 
-    // Position and Show
-    dom.options.menu.style.top = `${e.pageY}px`;
-    dom.options.menu.style.left = `${e.pageX}px`;
+    const pageX = e.pageX || (e.clientX + window.scrollX);
+    const pageY = e.pageY || (e.clientY + window.scrollY);
+
+    dom.options.menu.style.top = `${pageY}px`;
+    dom.options.menu.style.left = `${pageX}px`;
     toggleUI(dom.options.menu, true);
+    dom.options.menu.classList.add('show', 'active');
   };
 
-  document.querySelectorAll('.options-btn').forEach(btn => 
-    btn.addEventListener('click', showOptionsMenu)
-  );
+  document.addEventListener('click', (e) => {
+    const optBtn = e.target.closest('.options-btn');
+    if (optBtn) {
+      const item = optBtn.closest('.grid-item');
+      showOptionsMenu(e, item);
+      return;
+    }
+
+    if (dom.options.menu && !dom.options.menu.contains(e.target)) {
+      toggleUI(dom.options.menu, false);
+      dom.options.menu.classList.remove('show', 'active');
+    }
+  });
+
+  document.addEventListener('contextmenu', (e) => {
+    const item = e.target.closest('.grid-item');
+    if (item) {
+      showOptionsMenu(e, item);
+    }
+  });
 
   // === VIEW DETAILS ===
   dom.options.details.addEventListener('click', () => {
@@ -509,74 +545,118 @@
 
 
   // === STAR/UNSTAR LOGIC ===
-  document.querySelectorAll('.star-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation(); // Prevent triggering other click events (like opening options menu)
-      const itemId = btn.dataset.id;
-      const itemType = btn.dataset.type;
-      const isStarred = btn.dataset.starred === 'true';
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.star-toggle-btn');
+    if (!btn) return;
 
-      try {
-        const response = await fetch(`/${itemType}s/${itemId}/star`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isStarred: !isStarred,
-            itemType: itemType
-          }) // Toggle star status
-        });
+    e.preventDefault();
+    e.stopPropagation();
 
-        if (response.ok) {
-          // Optimistically toggle star in UI
-          const icon = btn.querySelector('.icon');
-          if (icon.classList.contains('hollow-star')) {
-            icon.classList.remove('hollow-star');
-            icon.classList.add('filled-star');
-            icon.textContent = '★';
-          } else {
-            icon.classList.remove('filled-star');
-            icon.classList.add('hollow-star');
-            icon.textContent = '☆';
-          }
-        } else {
-          alert("Failed to update star status.");
+    const itemId = btn.dataset.id;
+    const itemType = btn.dataset.type;
+    const isStarred = btn.dataset.starred === 'true';
+
+    try {
+      const response = await fetch(`/${itemType}s/${itemId}/star`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isStarred: !isStarred, itemType: itemType })
+      });
+
+      if (response.ok) {
+        const nextStarred = !isStarred;
+        btn.dataset.starred = nextStarred ? 'true' : 'false';
+
+        const starIcon = btn.querySelector('.star-icon, .icon, i');
+        if (starIcon) {
+          starIcon.className = `star-icon ${nextStarred ? 'ph-fill ph-star is-starred' : 'ph-duotone ph-star'}`;
         }
-      } catch (err) {
-        console.error("Error toggling star:", err);
+      } else {
+        alert("Failed to update star status.");
       }
-    });
+    } catch (err) {
+      console.error("Error toggling star:", err);
+    }
   });
 
-  // === UPLOAD MODAL ===
+  // === UPLOAD MODAL & DRAG/DROP ===
   const openUploadModal = () => toggleUI(dom.modals.upload, true);
   const tabUpload = document.getElementById('tabUpload');
   const tabFolder = document.getElementById('tabFolder');
   const formUpload = document.getElementById('formUploadCont');
   const formFolder = document.getElementById('formFolderCont');
+  const dropzone = document.getElementById('dropzone');
+  const selectedFileName = document.getElementById('selectedFileName');
+  const fileInput = document.getElementById('file');
+
   document.getElementById('openUploadModal')?.addEventListener('click', openUploadModal);
   document.querySelector('.empty-upload-btn')?.addEventListener('click', openUploadModal);
 
   // Add alert for file sizes larger than 10MB OR Invalid File Type
   const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
 
-  dom.upload.fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
+  function updateSelectedFileName(file) {
+    if (selectedFileName) {
+      selectedFileName.textContent = file ? `Selected: ${file.name}` : '';
+    }
+  }
 
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert('This file is too large to upload (Max 10MB).');
-        e.target.value = ""; // Clear the upload input
-      }
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
 
-      if (!allowedFileTypes.includes(file.type)) {
-        alert('Invalid File Type. Must be .jpg, .png, .pdf, or .txt');
-        e.target.value = ""; // Clear the upload input
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert('This file is too large to upload (Max 10MB).');
+          e.target.value = ""; // Clear the upload input
+          updateSelectedFileName(null);
+          return;
+        }
+
+        if (!allowedFileTypes.includes(file.type)) {
+          alert('Invalid File Type. Must be .jpg, .png, .pdf, or .txt');
+          e.target.value = ""; // Clear the upload input
+          updateSelectedFileName(null);
+          return;
+        }
+
+        updateSelectedFileName(file);
+      } else {
+        updateSelectedFileName(null);
       }
-    }}
-  );
+    });
+  }
+
+  if (dropzone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('drag-over');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('drag-over');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0 && fileInput) {
+        fileInput.files = files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+  }
 
   // Tab Switching Helper
   const switchTab = (activeTab, inactiveTab, showForm, hideForm) => {
+    if (!activeTab || !inactiveTab || !showForm || !hideForm) return;
     activeTab.classList.add('active');
     activeTab.classList.remove('inactive');
     inactiveTab.classList.add('inactive');
@@ -585,13 +665,15 @@
     hideForm.style.display = 'none';
   };
 
-  tabUpload.addEventListener('click', () => {
-    switchTab(tabUpload, tabFolder, formUpload, formFolder);
-  });
+  if (tabUpload && tabFolder) {
+    tabUpload.addEventListener('click', () => {
+      switchTab(tabUpload, tabFolder, formUpload, formFolder);
+    });
 
-  tabFolder.addEventListener('click', () => {
-    switchTab(tabFolder, tabUpload, formFolder, formUpload);
-  });
+    tabFolder.addEventListener('click', () => {
+      switchTab(tabFolder, tabUpload, formFolder, formUpload);
+    });
+  }
 
   // === GLOBAL CLOSING LOGIC ===
   window.addEventListener('click', (e) => {
@@ -705,5 +787,6 @@
   <%- include('partials/tutorial-modal.ejs') %>
     <script src="/scripts/tutorial.js"></script>
   <% } %>
+  <script src="/scripts/theme.js"></script>
 </body>
 </html>

@@ -3,13 +3,19 @@
 
 <aside class="app-sidebar" id="appSidebar">
   <nav class="side-nav">
-    <a href="/dashboard" class="nav-item <%= viewMode === 'dashboard' ? 'active' : '' %>">Home</a>
-    <a href="/dashboard/recent" class="nav-item <%= viewMode === 'recent' ? 'active' : '' %>">Recent</a>
-    <a href="/dashboard/starred" class="nav-item <%= viewMode === 'starred' ? 'active' : '' %>">Starred</a>
+    <a href="/dashboard" class="nav-item <%= viewMode === 'dashboard' ? 'active' : '' %>">
+      <i class="ph-duotone ph-house nav-icon"></i> Home
+    </a>
+    <a href="/dashboard/recent" class="nav-item <%= viewMode === 'recent' ? 'active' : '' %>">
+      <i class="ph-duotone ph-clock-counter-clockwise nav-icon"></i> Recent
+    </a>
+    <a href="/dashboard/starred" class="nav-item <%= viewMode === 'starred' ? 'active' : '' %>">
+      <i class="ph-duotone ph-star nav-icon"></i> Starred
+    </a>
 
     <div class="folder-tree-section">
       <h3 class="tree-root-toggle" id="root-folder-btn">
-        Folders
+        <i class="ph-duotone ph-folders tree-section-icon"></i> Folders
       </h3>
 
       <div id="main-folder-tree">
@@ -20,11 +26,11 @@
               <li>
                 <div class="tree-item" data-folder-id="<%= folder.id %>">
                   <% if (folder.children.length > 0) { %>
-                    <span class="caret-icon">▶</span>
+                    <span class="caret-icon"><i class="ph-duotone ph-caret-right"></i></span>
                   <% } else { %>
                     <span class="caret-spacer"></span>
                   <% } %>
-                  <span class="folder-name">📁 <%= folder.name %></span>
+                  <span class="folder-name"><i class="ph-duotone ph-folder tree-folder-icon"></i> <%= folder.name %></span>
                 </div>
 
                 <% if (folder.children.length > 0) { %>

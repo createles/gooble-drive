@@ -1,7 +1,7 @@
 const tutorialSteps = [
   {
     title: "Welcome!",
-    message: "Welcome to Gooble Drive! This quick tour will show you the ropes.",
+    message: "Welcome to Gobble Drive! This quick tour will show you the ropes.",
     target: null
   },
   {
@@ -30,13 +30,13 @@ const tutorialSteps = [
   },
   {
     title: "Upload your own Files and Folders",
-    message: "Use the 'Upload' button to add your own files and folders to Gooble Drive.",
+    message: "Use the 'Upload' button to add your own files and folders to Gobble Drive.",
     target: '#openUploadModal',
     expectedEvent: 'click'
   },
   {
     title: "You're ready to go!",
-    message: "That's it! You're ready to start managing your own files. Happy Goobling!",
+    message: "That's it! You're ready to start managing your own files. Happy Gobbling!",
     target: null,
     isFinal: true
   }

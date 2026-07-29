@@ -1,10 +1,9 @@
-<!-- A link will not be clickable -->
 <div class="breadcrumbs">
-  <a href="" class="breadcrumb-link"">Starred</a>
+  <a href="/dashboard/starred" class="breadcrumb-link"><i class="ph-duotone ph-star"></i> Starred Items</a>
 </div>
 
 <!-- Conditional Rendering based on database contents -->
-<% if ((locals.folders && folders.length> 0) || (locals.files && files.length > 0)) { %>
+<% if ((locals.folders && folders.length > 0) || (locals.files && files.length > 0)) { %>
 
   <div class="item-grid">
     <!-- Loop over folders -->
@@ -23,6 +22,7 @@
     <!-- Empty State -->
     <div class="empty-state">
       <div class="empty-state-content">
+        <i class="ph-duotone ph-star empty-icon"></i>
         <p>No starred files or folders.</p>
       </div>
     </div>

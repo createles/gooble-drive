@@ -5,19 +5,17 @@
   class="grid-item" data-type="folder" 
   data-id="<%= folder.id %>"
   data-name="<%= folder.name %>" 
-  data-size="===" 
+  data-size="--" 
   data-date="<%= folder.createdOn.toDateString() %>"
   data-parent-id="<%= folder.parentId || '' %>">
-  <button class="options-btn">&#8942;</button>
-  <div class="folder-icon" style="font-size: 2rem;">📁</div>
-  <div class="item-name">
+  <button class="options-btn" aria-label="Item options"><i class="ph-duotone ph-dots-three-vertical"></i></button>
+  <div class="folder-icon">
+    <i class="ph-duotone ph-folder item-type-icon"></i>
+  </div>
+  <div class="item-name" title="<%= folder.name %>">
     <%= folder.name %>
   </div>
-  <button class="star-toggle-btn" data-id="<%= folder.id %>" data-type="folder" data-starred="<%= folder.isStarred %>">
-    <% if (folder.isStarred) { %>
-      <span class="icon filled-star">★</span> 
-    <% } else { %>
-      <span class="icon hollow-star">☆</span> 
-    <% } %>
+  <button class="star-toggle-btn" data-id="<%= folder.id %>" data-type="folder" data-starred="<%= folder.isStarred %>" aria-label="Toggle star">
+    <i class="star-icon <%= folder.isStarred ? 'ph-fill ph-star is-starred' : 'ph-duotone ph-star' %>"></i>
   </button>
 </a>

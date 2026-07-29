@@ -1,10 +1,12 @@
 <% if (locals.errorMessage && errorMessage.length > 0) { %>
-  <div class="notif-message error" style="color: red;">
-    <%= errorMessage[0] %>
+  <div class="notif-message error">
+    <i class="ph-duotone ph-warning-circle notif-icon"></i>
+    <span><%= errorMessage[0] %></span>
   </div>
 <% } %>
 <% if (locals.successMessage && successMessage.length > 0) { %>
-  <div class="notif-message success" style="color: green;">
-    <%= successMessage[0] %>
+  <div class="notif-message success">
+    <i class="ph-duotone ph-check-circle notif-icon"></i>
+    <span><%= successMessage[0] %></span>
   </div>
 <% } %>

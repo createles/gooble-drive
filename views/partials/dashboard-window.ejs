@@ -1,18 +1,17 @@
 <!-- Clickable Navigation Breadcrumbs -->
 <div class="breadcrumbs">
-  <a href="/dashboard" class="breadcrumb-link">My Drive</a>
+  <a href="/dashboard" class="breadcrumb-link"><i class="ph-duotone ph-hard-drive"></i> My Drive</a>
 
   <% if (currentFolder) { %>
-    <span class="breadcrumb-separator">></span>
+    <span class="breadcrumb-separator"><i class="ph-duotone ph-caret-right"></i></span>
     <a href="/dashboard/<%= currentFolder.id %>" class="breadcrumb-link">
       <%= currentFolder.name %>
     </a>
-    <% } %>
-
+  <% } %>
 </div>
 
 <!-- Conditional Rendering based on database contents -->
-<% if ((locals.folders && folders.length> 0) || (locals.files && files.length > 0)) { %>
+<% if ((locals.folders && folders.length > 0) || (locals.files && files.length > 0)) { %>
 
   <div class="item-grid">
     <!-- Loop over folders -->
@@ -31,8 +30,9 @@
     <!-- Empty State -->
     <div class="empty-state">
       <div class="empty-state-content">
+        <i class="ph-duotone ph-cloud-arrow-up empty-icon"></i>
         <p>This directory is currently empty.</p>
-        <button class="btn-upload empty-upload-btn">Upload a File or Folder</button>
+        <button class="btn-primary empty-upload-btn"><i class="ph-duotone ph-upload-simple"></i> Upload a File or Folder</button>
       </div>
     </div>
 

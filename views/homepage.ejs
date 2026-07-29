@@ -3,30 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gooble Drive - <%= title %></title>
+  <title>Gobble Drive - <%= title %></title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('gobble_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&family=Shantell+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="/style.css"> 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
 </head>
-<body>
+<body class="public-landing-page">
   
+  <div class="top-theme-toggle">
+    <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light/dark theme" title="Toggle theme">
+      <i class="ph-duotone ph-sun theme-icon-light"></i>
+      <i class="ph-duotone ph-moon theme-icon-dark"></i>
+    </button>
+  </div>
+
   <section class="hero-banner">
-    <img src="/gooble_drive_logo.svg" alt="Logo" style="width: 200px; height: 200px;">
-    <h1
-      style="display: flex; align-items: center; justify-content: center; gap: 1rem; font-size: 3rem; color: var(--primary-color); margin-bottom: 0.5rem;">
-      Gooble Drive
-    </h1>
-    <h3 style="color: var(--text-muted); margin-bottom: 2rem;">Need storage? We'll gooble up your files for you.</h3>
+    <img src="/logo-icons/Gobble_Drive_Transparent.svg" alt="Gobble Drive Hero Logo" class="hero-logo-img">
     
-    <a href="/signup" class="btn-upload" style="display: inline-block; text-decoration: none;">Get Started for Free</a>
+    <h3 class="hero-tagline">Need storage? We'll gobble up your files for you.</h3>
+    
+    <a href="/signup" class="btn-primary hero-btn">
+      <i class="ph-duotone ph-rocket-launch"></i> Get Started for Free
+    </a>
   </section>
 
   <div class="members-login">
-    <p style="color: var(--text-muted); margin-bottom: 0.5rem;">Already a member?</p>
-    <a href="/login" style="color: var(--primary-color); font-weight: 600;">Log in to your dashboard</a>
+    <p class="members-text">Already a member?</p>
+    <a href="/login" class="members-link">
+      <i class="ph-duotone ph-sign-in"></i> Log in to your dashboard
+    </a>
   </div>
 
+  <script src="/scripts/theme.js"></script>
 </body>
 </html>

@@ -1,14 +1,14 @@
 <div id="moveModal" class="modal-overlay">
   <div class="modal-content">
-    <h3>Move <span id="moveItemType">item</span></h3>
-    <div style="font-size: 0.8rem; display: none;" id="moveFolderName">📁</div>
-    <div style="font-size: 0.8rem; display: none;" id="moveFileName">📄</div>
+    <h3><i class="ph-duotone ph-arrows-out-cardinal"></i> Move <span id="moveItemType">item</span></h3>
+    <div style="font-size: 0.8rem; display: none;" id="moveFolderName"><i class="ph-duotone ph-folder"></i></div>
+    <div style="font-size: 0.8rem; display: none;" id="moveFileName"><i class="ph-duotone ph-file-text"></i></div>
     <p>Select destination folder:</p>
     
     <form id="moveForm">
       <select name="destinationId" id="folderSelect">
         <option value="root">Dashboard (Root)</option>
-        </select>
+      </select>
       
       <div class="modal-buttons">
         <button type="button" id="closeMoveModal" class="btn-secondary">Cancel</button>

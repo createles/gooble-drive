@@ -1,29 +1,41 @@
 <header class="app-header">
   <% if (!isPublic) { %>
-  <!-- Hamburger button — only visible on mobile via CSS -->
+  <!-- Hamburger button — visible on mobile -->
   <button class="hamburger-btn" id="sidebarToggleBtn" aria-label="Toggle navigation">
-    <span></span>
-    <span></span>
-    <span></span>
+    <i class="ph-duotone ph-list"></i>
   </button>
   <% } %>
 
-  <a href="/dashboard" class="brand-container">
-    <img src="/gooble_drive_logo.svg" alt="Gooble Drive Logo" class="brand-icon">
-    <span class="brand-name">Gooble Drive</span>
+  <a href="/dashboard" class="brand-container" aria-label="Gobble Drive Home">
+    <img src="/logo-icons/Gobble_Drive_Transparent.svg" alt="Gobble Drive" class="brand-icon-nav">
   </a>
 
   <% if (!isPublic) { %>
-  <div class="search-bar" style="position: relative;">
-    <input type="text" id="searchInput" placeholder="Search files and folders..." autocomplete="off">
+  <div class="search-bar">
+    <i class="ph-duotone ph-magnifying-glass search-icon"></i>
+    <input type="text" id="searchInput" placeholder="Search Gobble Drive..." autocomplete="off">
     <div id="searchResults" class="search-dropdown"></div>
   </div>
 
-  <div class="user-profile">
-    <span class="user-name"><%= currentUser.username %></span>
-    <div class="avatar">
-      <%= currentUser.username.charAt(0).toUpperCase() %>
+  <div class="header-actions">
+    <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light/dark theme" title="Toggle theme">
+      <i class="ph-duotone ph-sun theme-icon-light"></i>
+      <i class="ph-duotone ph-moon theme-icon-dark"></i>
+    </button>
+
+    <div class="user-profile-pill" tabindex="0">
+      <div class="avatar" title="<%= currentUser.username %>">
+        <%= currentUser.username.charAt(0).toUpperCase() %>
+      </div>
+      <span class="user-name"><%= currentUser.username %></span>
     </div>
+  </div>
+  <% } else { %>
+  <div class="header-actions">
+    <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light/dark theme" title="Toggle theme">
+      <i class="ph-duotone ph-sun theme-icon-light"></i>
+      <i class="ph-duotone ph-moon theme-icon-dark"></i>
+    </button>
   </div>
   <% } %>
 </header>

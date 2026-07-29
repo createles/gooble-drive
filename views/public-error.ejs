@@ -3,10 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Gobble Drive - Error</title>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('gobble_theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&family=Shantell+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 </head>
-<body>
-    <%- include('partials/notif-message.ejs') %>
-    <h1><%= message %></h1>
+<body class="auth-page">
+    <div class="top-theme-toggle">
+      <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle light/dark theme" title="Toggle theme">
+        <i class="ph-duotone ph-sun theme-icon-light"></i>
+        <i class="ph-duotone ph-moon theme-icon-dark"></i>
+      </button>
+    </div>
+
+    <div class="auth-card error-card">
+      <div class="auth-brand">
+        <img src="/logo-icons/Gobble_Drive_Transparent.svg" alt="Gobble Drive Logo" class="auth-logo-nav">
+      </div>
+      <%- include('partials/notif-message.ejs') %>
+      <div class="error-message-content">
+        <i class="ph-duotone ph-warning-octagon error-icon"></i>
+        <h1><%= message %></h1>
+        <p>The link you are trying to access may have expired or does not exist.</p>
+        <a href="/" class="btn-primary" style="margin-top: 1.5rem; display: inline-flex;"><i class="ph-duotone ph-house"></i> Return Home</a>
+      </div>
+    </div>
+
+    <script src="/scripts/theme.js"></script>
 </body>
 </html>

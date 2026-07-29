@@ -1,6 +1,5 @@
-<!-- A link will not be clickable -->
 <div class="breadcrumbs">
-  <a href="" class="breadcrumb-link"">Recent Activity</a>
+  <a href="/dashboard/recent" class="breadcrumb-link"><i class="ph-duotone ph-clock-counter-clockwise"></i> Recent Activity</a>
 </div>
 
 <!-- Conditional Rendering based on database contents -->
@@ -8,22 +7,22 @@
 
   <div class="item-grid">
         <!-- Loop over files, sectioned by activity date -->
-         <% if (categorizedFiles.today.length > 0) { %>
-          <h3 class="grid-section-header"> Today </h3>
+         <% if (categorizedFiles.today && categorizedFiles.today.length > 0) { %>
+          <h3 class="grid-section-header"><i class="ph-duotone ph-calendar-check"></i> Today</h3>
             <% categorizedFiles.today.forEach(file=> { %>
               <%- include('file-item.ejs', { file }) %>
             <% }) %>
           <% } %>
 
-          <% if (categorizedFiles.pastWeek.length > 0) { %>
-          <h3 class="grid-section-header"> In the past week </h3>
+          <% if (categorizedFiles.pastWeek && categorizedFiles.pastWeek.length > 0) { %>
+          <h3 class="grid-section-header"><i class="ph-duotone ph-calendar-blank"></i> In the past week</h3>
             <% categorizedFiles.pastWeek.forEach(file=> { %>
               <%- include('file-item.ejs', { file }) %>
             <% }) %>
           <% } %>
 
-          <% if (categorizedFiles.pastMonth.length > 0) { %>
-          <h3 class="grid-section-header"> In the past month </h3>
+          <% if (categorizedFiles.pastMonth && categorizedFiles.pastMonth.length > 0) { %>
+          <h3 class="grid-section-header"><i class="ph-duotone ph-calendar"></i> In the past month</h3>
             <% categorizedFiles.pastMonth.forEach(file=> { %>
               <%- include('file-item.ejs', { file }) %>
             <% }) %>
@@ -35,6 +34,7 @@
     <!-- Empty State -->
     <div class="empty-state">
       <div class="empty-state-content">
+        <i class="ph-duotone ph-clock-counter-clockwise empty-icon"></i>
         <p>No recent activity.</p>
       </div>
     </div>

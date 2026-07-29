@@ -5,33 +5,40 @@
   data-type="file"
   data-id="<%= file.id %>"
   data-name="<%= file.name %>"
-  data-url="<%= file.url%>"
+  data-url="<%= file.url || '/download/' + file.id %>"
   <% const sizeInKB = file.size / 1024; const sizeInMB = file.size / 1024 / 1024; const sizeLabel = sizeInMB >= 1 ? `${sizeInMB.toFixed(1)} MB` : `${sizeInKB.toFixed(1)} KB`; %>
   data-size="<%= sizeLabel %>" 
   data-date="<%= file.uploadTime.toDateString() %>"
   data-parent-id="<%= file.folderId || '' %>">
-  <button class="options-btn">&#8942;</button>
-  <div class="file-icon" style="font-size: 2rem;">📄</div>
+  <button class="options-btn" aria-label="Item options"><i class="ph-duotone ph-dots-three-vertical"></i></button>
+  
+  <% const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase(); const baseName = file.name.replace(file.name.slice(file.name.lastIndexOf('.')), ''); %>
+  <% let fileIconClass = 'ph-file-text'; %>
+  <% if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'].includes(ext)) { fileIconClass = 'ph-file-image'; } %>
+  <% if (ext === '.pdf') { fileIconClass = 'ph-file-pdf'; } %>
+  <% if (['.mp4', '.mov', '.webm'].includes(ext)) { fileIconClass = 'ph-file-video'; } %>
+  <% if (['.mp3', '.wav', '.ogg'].includes(ext)) { fileIconClass = 'ph-file-audio'; } %>
+
+  <div class="file-icon">
+    <i class="ph-duotone <%= fileIconClass %> item-type-icon"></i>
+  </div>
   <div class="file-info">
-    <% const ext=file.name.slice(file.name.lastIndexOf('.')); const baseName=file.name.replace(ext, '' ); %>
-      <div class="item-name">
-        <%= baseName %>
-      </div>
-      <div class="file-ext">
-        <%= ext.toUpperCase().replace('.', '' ) %>
-      </div>
-      <div class="item-size" style="font-size: 0.8rem; color: var(--text-muted);">
-        <%= sizeLabel %>
-      </div>
+    <div class="item-name" title="<%= file.name %>">
+      <%= baseName %>
+    </div>
+    <div class="file-ext">
+      <%= ext.toUpperCase().replace('.', '') %>
+    </div>
+    <div class="item-size">
+      <%= sizeLabel %>
+    </div>
   </div>
   <% if (viewMode === 'recent') { %>
-    <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>">📁 <span class="recent-folder-link"><%= file.folder ? file.folder.name : 'My Drive'%></span></a>
+    <a href="/dashboard/<%= file.folder ? file.folder.id : ''%>" class="recent-folder-badge">
+      <i class="ph-duotone ph-folder"></i> <span class="recent-folder-link"><%= file.folder ? file.folder.name : 'My Drive'%></span>
+    </a>
   <% } %>
-  <button class="star-toggle-btn" data-id="<%= file.id %>" data-type="file" data-starred="<%= file.isStarred %>">
-    <% if (file.isStarred) { %>
-      <span class="icon filled-star">★</span> 
-    <% } else { %>
-      <span class="icon hollow-star">☆</span> 
-    <% } %>
+  <button class="star-toggle-btn" data-id="<%= file.id %>" data-type="file" data-starred="<%= file.isStarred %>" aria-label="Toggle star">
+    <i class="star-icon <%= file.isStarred ? 'ph-fill ph-star is-starred' : 'ph-duotone ph-star' %>"></i> 
   </button>
 </div>

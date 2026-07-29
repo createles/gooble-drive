@@ -3,8 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>Gobble Drive - <%= title %></title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('gobble_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;500;600;700&family=Shantell+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="/style.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
 </head>
 <body class="dashboard-layout public-view">
 
@@ -13,8 +29,8 @@
   <main class="app-main public-main" style="grid-column: 1 / 1; width: 100%;">
     
     <div class="breadcrumbs">
-      <span class="breadcrumb-link">Shared Content</span>
-      <span class="breadcrumb-separator">></span>
+      <span class="breadcrumb-link"><i class="ph-duotone ph-share-network"></i> Shared Content</span>
+      <span class="breadcrumb-separator"><i class="ph-duotone ph-caret-right"></i></span>
       <span class="breadcrumb-current">
         <%= sharedData.file ? sharedData.file.name : sharedData.folder.name %>
       </span>
@@ -23,35 +39,41 @@
     <div class="item-grid">
       <% if (sharedData.file) { %>
         <div class="grid-item file-item">
-          <div class="item-icon file-icon">📄</div>
-          <div class="item-info">
-            <span class="item-name"><%= sharedData.file.name %></span>
-            <span class="item-meta"><%= (sharedData.file.size / 1024).toFixed(1) %> KB</span>
+          <div class="file-icon">
+            <i class="ph-duotone ph-file-text item-type-icon"></i>
           </div>
-          <a href="/public/download/<%= sharedData.id %>" class="btn-download-public">
-            Download
+          <div class="file-info">
+            <span class="item-name"><%= sharedData.file.name %></span>
+            <span class="item-size"><%= (sharedData.file.size / 1024).toFixed(1) %> KB</span>
+          </div>
+          <a href="/public/download/<%= sharedData.id %>" class="btn-primary btn-download-public">
+            <i class="ph-duotone ph-download-simple"></i> Download
           </a>
         </div>
 
       <% } else if (sharedData.folder) { %>
         <% sharedData.contents.folders.forEach(folder => { %>
           <div class="grid-item folder-item read-only">
-            <div class="item-icon">📁</div>
-            <div class="item-info">
+            <div class="folder-icon">
+              <i class="ph-duotone ph-folder item-type-icon"></i>
+            </div>
+            <div class="file-info">
               <span class="item-name"><%= folder.name %></span>
             </div>
-            </div>
+          </div>
         <% }) %>
 
         <% sharedData.contents.files.forEach(file => { %>
           <div class="grid-item file-item">
-            <div class="item-icon">📄</div>
-            <div class="item-info">
-              <span class="item-name"><%= file.name %></span>
-              <span class="item-meta"><%= (file.size / 1024).toFixed(1) %> KB</span>
+            <div class="file-icon">
+              <i class="ph-duotone ph-file-text item-type-icon"></i>
             </div>
-            <a href="/public/download/<%= sharedData.id %>?fileId=<%= file.id %>" class="btn-download-public">
-               Download
+            <div class="file-info">
+              <span class="item-name"><%= file.name %></span>
+              <span class="item-size"><%= (file.size / 1024).toFixed(1) %> KB</span>
+            </div>
+            <a href="/public/download/<%= sharedData.id %>?fileId=<%= file.id %>" class="btn-primary btn-download-public">
+               <i class="ph-duotone ph-download-simple"></i> Download
             </a>
           </div>
         <% }) %>
@@ -61,9 +83,14 @@
 
     <% if (sharedData.folder && sharedData.contents.folders.length === 0 && sharedData.contents.files.length === 0) { %>
       <div class="empty-state">
-        <p>This shared folder is empty.</p>
+        <div class="empty-state-content">
+          <i class="ph-duotone ph-folder-open empty-icon"></i>
+          <p>This shared folder is empty.</p>
+        </div>
       </div>
     <% } %>
   </main>
+
+  <script src="/scripts/theme.js"></script>
 </body>
 </html>
