@@ -1686,14 +1686,17 @@ a {
 
 .auth-brand {
   display: flex;
+  height: 100px;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.5rem;
+  position: relative;
+  top: 10px;
 }
 
 .auth-logo-nav {
   width: 200px;
-  height: 60px;
+  height: auto;
   object-fit: contain;
   -webkit-mask-size: contain;
   mask-size: contain;
