@@ -265,13 +265,27 @@
       dom.options.download.href = `/download/${itemId}`;
     }
 
-    const pageX = e.pageX || (e.clientX + window.scrollX);
-    const pageY = e.pageY || (e.clientY + window.scrollY);
+    let pageX = e.pageX || (e.clientX + window.scrollX);
+    let pageY = e.pageY || (e.clientY + window.scrollY);
+
+    // Make it block briefly to calculate dimensions
+    dom.options.menu.style.visibility = 'hidden';
+    toggleUI(dom.options.menu, true);
+    dom.options.menu.classList.add('show', 'active');
+
+    const menuWidth = dom.options.menu.offsetWidth;
+    const menuHeight = dom.options.menu.offsetHeight;
+    
+    // Viewport boundaries with 10px padding
+    const maxLeft = window.innerWidth + window.scrollX - menuWidth - 10;
+    const maxTop = window.innerHeight + window.scrollY - menuHeight - 10;
+    
+    if (pageX > maxLeft) pageX = maxLeft;
+    if (pageY > maxTop) pageY = maxTop;
 
     dom.options.menu.style.top = `${pageY}px`;
     dom.options.menu.style.left = `${pageX}px`;
-    toggleUI(dom.options.menu, true);
-    dom.options.menu.classList.add('show', 'active');
+    dom.options.menu.style.visibility = 'visible';
   };
 
   document.addEventListener('click', (e) => {
