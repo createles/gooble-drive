@@ -1,10 +1,10 @@
-# Gooble Drive 📁☁️
+# Gobble Drive 📁☁️
 
 [English](README.md) | [日本語](README.ja.md)
 
-> [The Odin Project - File Uploader Lesson](https://www.theodinproject.com/lessons/nodejs-file-uploader) の課題として開発されたフルスタックの Google Drive クローンアプリ。
+> [The Odin Project - File Uploader Lesson](https://www.theodinproject.com/lessons/nodejs-file-uploader) の課題として開発されたフルスタックの Gobble Drive クローンアプリ。
 
-**Gooble Drive** は、クラウドファイルストレージとフォルダ管理を提供するモダンでレスポンシブな Web アプリケーションです。Node.js、Express、PostgreSQL、Prisma ORM、Supabase Storage を使用して構築されており、ファイルのアップロード、階層フォルダの整理、コピー/移動、期限付き公開共有リンクの作成、スター機能、ドライブ内検索など、Google Drive で馴染みのあるワークフローを備えています。
+**Gobble Drive** は、クラウドファイルストレージとフォルダ管理を提供するモダンでレスポンシブな Web アプリケーションです。Node.js、Express、PostgreSQL、Prisma ORM、Supabase Storage を使用して構築されており、ファイルのアップロード、階層フォルダの整理、コピー/移動、期限付き公開共有リンクの作成、スター機能、ドライブ内検索など、Google Drive で馴染みのあるワークフローを備えています。
 
 ---
 

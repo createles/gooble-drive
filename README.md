@@ -1,10 +1,10 @@
-# Gooble Drive 📁☁️
+# Gobble Drive 📁☁️
 
 [English](README.md) | [日本語](README.ja.md)
 
-> A full-stack Google Drive clone built as part of [The Odin Project - File Uploader Lesson](https://www.theodinproject.com/lessons/nodejs-file-uploader).
+> A full-stack cloud storage application built as part of [The Odin Project - File Uploader Lesson](https://www.theodinproject.com/lessons/nodejs-file-uploader).
 
-**Gooble Drive** is a modern, responsive web application for cloud file storage and folder management. Built with Node.js, Express, PostgreSQL, Prisma ORM, and Supabase Storage, it allows users to manage their personal files with familiar Google Drive workflows: uploading files, organizing nested folders, copying/moving items, sharing temporary public download links, starring important items, and searching across their drive.
+**Gobble Drive** is a modern, responsive web application for cloud file storage and folder management. Built with Node.js, Express, PostgreSQL, Prisma ORM, and Supabase Storage, it allows users to manage their personal files: uploading files, organizing nested folders, copying/moving items, sharing temporary public download links, starring important items, and searching across their drive.
 
 ---
 
