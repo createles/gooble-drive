@@ -13,8 +13,18 @@
           <i class="ph-duotone ph-cloud-arrow-up dropzone-icon"></i>
           <span class="dropzone-text">Drag & drop files here, or <strong class="dropzone-browse">browse</strong></span>
           <input type="file" name="file" id="file" required class="dropzone-file-input">
-          <span class="selected-file-name" id="selectedFileName"></span>
         </div>
+        
+        <div class="upload-file-preview" id="filePreviewContainer" style="display: none;">
+          <i class="ph-duotone ph-file-text upload-file-preview-icon"></i>
+          <div class="upload-file-preview-info">
+            <span class="upload-file-name" id="selectedFileName"></span>
+          </div>
+          <button type="button" class="upload-file-remove" id="clearFileBtn" aria-label="Remove file">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+        
         <input type="hidden" name="parentId" value="<%= locals.currentFolder ? currentFolder.id : '' %>">
         <button type="submit" class="btn-primary btn-upload"><i class="ph-duotone ph-upload-simple"></i> Upload File</button>
       </form>

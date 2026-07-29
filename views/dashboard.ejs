@@ -602,6 +602,8 @@
   const dropzone = document.getElementById('dropzone');
   const selectedFileName = document.getElementById('selectedFileName');
   const fileInput = document.getElementById('file');
+  const filePreviewContainer = document.getElementById('filePreviewContainer');
+  const clearFileBtn = document.getElementById('clearFileBtn');
 
   document.getElementById('openUploadModal')?.addEventListener('click', openUploadModal);
   document.querySelector('.empty-upload-btn')?.addEventListener('click', openUploadModal);
@@ -610,9 +612,25 @@
   const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'];
 
   function updateSelectedFileName(file) {
-    if (selectedFileName) {
-      selectedFileName.textContent = file ? `Selected: ${file.name}` : '';
+    if (selectedFileName && dropzone && filePreviewContainer) {
+      if (file) {
+        selectedFileName.textContent = file.name;
+        dropzone.style.display = 'none';
+        filePreviewContainer.style.display = 'flex';
+      } else {
+        selectedFileName.textContent = '';
+        dropzone.style.display = 'flex';
+        filePreviewContainer.style.display = 'none';
+      }
     }
+  }
+
+  if (clearFileBtn) {
+    clearFileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (fileInput) fileInput.value = '';
+      updateSelectedFileName(null);
+    });
   }
 
   if (fileInput) {
