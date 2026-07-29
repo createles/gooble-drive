@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma.js' // the project's prisma client
 // -- Sign Up Handlers -- 
 export const getSignup = (req, res) => {
       res.render("sign-up-form", {
-        title: 'Gooble Drive - Sign Up',
+        title: 'Gobble Drive - Sign Up',
         errorMessage: req.flash('error'), // pass notif messages to ejs
         successMessage: req.flash('success')
     })
@@ -29,7 +29,7 @@ export const postSignup = async (req, res, next) => {
     // Define metadata for tutorial files
     const TUTORIAL_ASSETS = [
       {
-        name: 'Welcome to Gooble Drive.txt',
+        name: 'Welcome to Gobble Drive.txt',
         path: 'tutorial-assets/Welcome to Gooble Drive.txt',
         url: 'https://znethacxsuqbizfrtkul.supabase.co/storage/v1/object/public/uploads/tutorial-assets/Welcome%20to%20Gooble%20Drive.txt',
         size: 0.322,
@@ -110,7 +110,7 @@ export const postSignup = async (req, res, next) => {
 // -- Login Handlers -- 
 export const getLogin = (req, res) => {
   res.render('login', {
-    title: 'Gooble Drive - Log in',
+    title: 'Gobble Drive - Log in',
     errorMessage: req.flash('error'),
     successMessage: req.flash('success')
   })
