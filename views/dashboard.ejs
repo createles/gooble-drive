@@ -31,6 +31,7 @@
   <%- include('partials/share-modal.ejs') %>
   <%- include('partials/move-modal.ejs') %>
   <%- include('partials/log-out-modal.ejs') %>
+  <%- include('partials/preview-modal.ejs') %>
 
   <% if (viewMode !== 'recent') { %>
     <%- include('partials/add-btn.ejs') %>
@@ -67,7 +68,8 @@
       details: document.getElementById('detailsModal'),
       share: document.getElementById('shareModal'),
       move: document.getElementById('moveModal'),
-      logout: document.getElementById('logoutModal')
+      logout: document.getElementById('logoutModal'),
+      preview: document.getElementById('previewModal')
     },
     upload: {
       fileInput: document.getElementById('file'),
@@ -88,6 +90,7 @@
     },
     options: {
       menu: document.getElementById('optionsMenu'),
+      preview: document.getElementById('optionsPreviewBtn'),
       details: document.getElementById('optionsDetailsBtn'),
       download: document.getElementById('optionsDlBtn'),
       share: document.getElementById('optionsShareBtn'),
@@ -95,6 +98,10 @@
       rename: document.getElementById('optionsRenameBtn'),
       copy: document.getElementById('optionsCopyBtn'),
       move: document.getElementById('optionsMoveBtn'),
+    },
+    preview: {
+      title: document.getElementById('previewModalTitle'),
+      body: document.getElementById('previewModalBody')
     },
   };
 
@@ -203,6 +210,43 @@
 
   // === GRID ITEM BEHAVIOR ===
 
+  const openPreviewModal = (itemName, fileUrl, mimeType) => {
+    dom.preview.title.textContent = itemName;
+    dom.preview.body.innerHTML = ''; // Clear previous content
+
+    // Basic type checking
+    if (mimeType && mimeType.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = fileUrl;
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '70vh';
+      img.style.objectFit = 'contain';
+      dom.preview.body.appendChild(img);
+    } else if (mimeType && mimeType.startsWith('video/')) {
+      const video = document.createElement('video');
+      video.src = fileUrl;
+      video.controls = true;
+      video.style.maxWidth = '100%';
+      video.style.maxHeight = '70vh';
+      dom.preview.body.appendChild(video);
+    } else if (mimeType && mimeType.startsWith('audio/')) {
+      const audio = document.createElement('audio');
+      audio.src = fileUrl;
+      audio.controls = true;
+      audio.style.width = '100%';
+      dom.preview.body.appendChild(audio);
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src = fileUrl;
+      iframe.style.width = '100%';
+      iframe.style.height = '70vh';
+      iframe.style.border = 'none';
+      dom.preview.body.appendChild(iframe);
+    }
+    
+    toggleUI(dom.modals.preview, true);
+  };
+
   const syncDetailsPane = (item) => {
     // Populate Details Pane
     dom.details.name.textContent = item.dataset.name;
@@ -237,15 +281,49 @@
     
     } else if (itemType === 'file') {
       const fileUrl = item.dataset.url || `/download/${item.dataset.id}`;
+      // Assuming item.dataset.mime is available, or fallback
+      const mimeType = item.dataset.mime || 'application/octet-stream';
       if (fileUrl) {
-        window.open(fileUrl, '_blank');
+        openPreviewModal(item.dataset.name, fileUrl, mimeType);
       }
     }
   });
 
   // === OPTIONS MENU LOGIC ===
+  let menuClosingTimeout = null;
+
+  const hideOptionsMenu = () => {
+    if (!dom.options.menu) return;
+
+    if (menuClosingTimeout) {
+      clearTimeout(menuClosingTimeout);
+      menuClosingTimeout = null;
+    }
+
+    if (dom.options.menu.classList.contains('active') || dom.options.menu.classList.contains('show')) {
+      dom.options.menu.classList.remove('show', 'active');
+      dom.options.menu.classList.add('closing');
+
+      menuClosingTimeout = setTimeout(() => {
+        dom.options.menu.classList.remove('closing');
+        toggleUI(dom.options.menu, false);
+        menuClosingTimeout = null;
+      }, 150);
+    } else {
+      dom.options.menu.classList.remove('closing', 'show', 'active');
+      toggleUI(dom.options.menu, false);
+    }
+  };
+
   const showOptionsMenu = (e, item) => {
     if (!item) return;
+
+    if (menuClosingTimeout) {
+      clearTimeout(menuClosingTimeout);
+      menuClosingTimeout = null;
+    }
+    dom.options.menu.classList.remove('closing');
+
     const itemId = item.dataset.id;
     const itemType = item.dataset.type;
     const itemName = item.dataset.name;
@@ -280,6 +358,10 @@
     const maxLeft = window.innerWidth + window.scrollX - menuWidth - 10;
     const maxTop = window.innerHeight + window.scrollY - menuHeight - 10;
     
+    if (dom.options.preview) {
+      dom.options.preview.style.display = itemType === 'folder' ? 'none' : 'flex';
+    }
+
     if (pageX > maxLeft) pageX = maxLeft;
     if (pageY > maxTop) pageY = maxTop;
 
@@ -297,8 +379,7 @@
     }
 
     if (dom.options.menu && !dom.options.menu.contains(e.target)) {
-      toggleUI(dom.options.menu, false);
-      dom.options.menu.classList.remove('show', 'active');
+      hideOptionsMenu();
     }
   });
 
@@ -309,11 +390,31 @@
     }
   });
 
+  // Close options menu when any option inside it is clicked
+  dom.options.menu?.addEventListener('click', (e) => {
+    if (e.target.closest('button, a')) {
+      hideOptionsMenu();
+    }
+  });
+
   // === VIEW DETAILS ===
   dom.options.details.addEventListener('click', () => {
     dom.layout.classList.add('show-details');
-    toggleUI(dom.options.menu, false);
+    hideOptionsMenu();
   })
+
+  // === PREVIEW FILE ===
+  dom.options.preview?.addEventListener('click', () => {
+    hideOptionsMenu();
+    const id = dom.options.menu.dataset.activeId;
+    const name = dom.options.menu.dataset.activeName;
+    
+    const itemElement = document.querySelector(`.grid-item[data-id="${id}"][data-type="file"]`);
+    const fileUrl = itemElement && itemElement.dataset.url ? itemElement.dataset.url : `/download/${id}`; 
+    const mimeType = itemElement ? itemElement.dataset.mime : 'application/octet-stream';
+
+    openPreviewModal(name, fileUrl, mimeType);
+  });
 
   // === SHARE FEATURE (Fetch API) ===
   const openShareModal = (itemId, itemType) => {
@@ -323,7 +424,7 @@
   };
 
   dom.options.share?.addEventListener('click', () => {
-    dom.options.menu.classList.remove('active');
+    hideOptionsMenu();
     const itemId = dom.options.menu.dataset.activeId;
     const itemType = dom.options.menu.dataset.activeType;
     openShareModal(itemId, itemType);
@@ -422,7 +523,7 @@
   const folderSelect = document.getElementById('folderSelect');
 
   dom.options.move.addEventListener('click', async () => {
-    dom.options.menu.classList.remove('active');
+    hideOptionsMenu();
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
     const name = dom.options.menu.dataset.activeName;
@@ -553,7 +654,7 @@
     } catch (err) {
       console.error("Error with copy operation:", err);
     } finally {
-      toggleUI(dom.options.menu, false);
+      hideOptionsMenu();
     }
   })
 
@@ -713,10 +814,11 @@
     if (e.target === dom.modals.upload) toggleUI(dom.modals.upload, false);
     if (e.target === dom.modals.share) toggleUI(dom.modals.share, false);
     if (e.target === dom.modals.move) toggleUI(dom.modals.move, false);
+    if (e.target === dom.modals.preview) toggleUI(dom.modals.preview, false);
 
     // Close options menu if clicking outside
-    if (dom.options.menu.classList.contains('active') && !dom.options.menu.contains(e.target)) {
-      dom.options.menu.classList.remove('active');
+    if ((dom.options.menu.classList.contains('active') || dom.options.menu.classList.contains('show')) && !dom.options.menu.contains(e.target)) {
+      hideOptionsMenu();
     }
 
     // Close details pane if clicking empty grid space
@@ -729,11 +831,11 @@
   const hideAllModals = () => {
     // Object.values selects all modals, .forEach modal attaches toggle
     Object.values(dom.modals).forEach(modal => toggleUI(modal, false));
-    dom.options.menu.classList.remove('active');
+    hideOptionsMenu();
     dom.layout.classList.remove('show-details');
   };
 
-  document.querySelectorAll('.close-modal, #closeDetails, #closeUploadModal, #closeMoveModal, #closeShareModal').forEach(btn => {
+  document.querySelectorAll('.close-modal, #closeDetails, #closeUploadModal, #closeMoveModal, #closeShareModal, #closePreviewModal').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideAllModals();

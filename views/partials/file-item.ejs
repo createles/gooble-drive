@@ -9,10 +9,23 @@
   <% const sizeInKB = file.size / 1024; const sizeInMB = file.size / 1024 / 1024; const sizeLabel = sizeInMB >= 1 ? `${sizeInMB.toFixed(1)} MB` : `${sizeInKB.toFixed(1)} KB`; %>
   data-size="<%= sizeLabel %>" 
   data-date="<%= file.uploadTime.toDateString() %>"
+  <% const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase(); const baseName = file.name.replace(file.name.slice(file.name.lastIndexOf('.')), ''); %>
+  <% 
+    let fileMime = 'application/octet-stream';
+    if (['.jpg', '.jpeg'].includes(ext)) fileMime = 'image/jpeg';
+    if (ext === '.png') fileMime = 'image/png';
+    if (ext === '.gif') fileMime = 'image/gif';
+    if (ext === '.webp') fileMime = 'image/webp';
+    if (ext === '.svg') fileMime = 'image/svg+xml';
+    if (ext === '.pdf') fileMime = 'application/pdf';
+    if (ext === '.txt') fileMime = 'text/plain';
+    if (['.mp4', '.mov', '.webm'].includes(ext)) fileMime = 'video/mp4';
+    if (['.mp3', '.wav', '.ogg'].includes(ext)) fileMime = 'audio/mpeg';
+  %>
+  data-mime="<%= fileMime %>"
   data-parent-id="<%= file.folderId || '' %>">
   <button class="options-btn" aria-label="Item options"><i class="ph-duotone ph-dots-three-vertical"></i></button>
   
-  <% const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase(); const baseName = file.name.replace(file.name.slice(file.name.lastIndexOf('.')), ''); %>
   <% let fileIconClass = 'ph-file-text'; %>
   <% if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'].includes(ext)) { fileIconClass = 'ph-file-image'; } %>
   <% if (ext === '.pdf') { fileIconClass = 'ph-file-pdf'; } %>
