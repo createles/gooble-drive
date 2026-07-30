@@ -55,7 +55,7 @@
 ## 📁 プロジェクト構造
 
 ```
-gooble-drive/
+gobble-drive/
 ├── config/
 │   └── passport-config.js      # Passport ローカル戦略およびシリアライズ設定
 ├── controllers/
@@ -74,7 +74,7 @@ gooble-drive/
 ├── public/
 │   ├── style.css               # Google Drive にインスパイアされたカスタム CSS
 │   ├── scripts/                # フロントエンドスクリプト（チュートリアル、モーダル）
-│   └── gooble_drive_logo.svg   # プロジェクトロゴ・ファビコン
+│   └── gobble_drive_logo.svg   # プロジェクトロゴ・ファビコン
 ├── routes/
 │   ├── appRouter.js            # メインアプリケーションルーター
 │   ├── dashboardRouter.js      # ダッシュボード & 検索サブサブルーティング
@@ -100,8 +100,8 @@ gooble-drive/
 
 ### 1. クローン & 依存関係のインストール
 ```bash
-git clone https://github.com/your-username/gooble-drive.git
-cd gooble-drive
+git clone https://github.com/your-username/gobble-drive.git
+cd gobble-drive
 npm install
 ```
 
@@ -109,7 +109,7 @@ npm install
 プロジェクトルートに `.env` ファイルを作成します:
 ```env
 PORT=3000
-DATABASE_URL="postgresql://user:password@localhost:5432/gooble_drive?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/gobble_drive?schema=public"
 SESSION_SECRET="your_secret_key_here"
 SUPABASE_URL="https://your-supabase-project.supabase.co"
 SUPABASE_KEY="your-supabase-anon-key"

@@ -55,7 +55,7 @@
 ## 📁 Project Architecture
 
 ```
-gooble-drive/
+gobble-drive/
 ├── config/
 │   └── passport-config.js      # Passport local strategy & serialization
 ├── controllers/
@@ -74,7 +74,7 @@ gooble-drive/
 ├── public/
 │   ├── style.css               # Google Drive inspired custom CSS design
 │   ├── scripts/                # Front-end interactivity (tutorial, modals)
-│   └── gooble_drive_logo.svg   # Project logo & favicons
+│   └── gobble_drive_logo.svg   # Project logo & favicons
 ├── routes/
 │   ├── appRouter.js            # Main application router
 │   ├── dashboardRouter.js      # Dashboard & search sub-routes
@@ -100,8 +100,8 @@ gooble-drive/
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/your-username/gooble-drive.git
-cd gooble-drive
+git clone https://github.com/your-username/gobble-drive.git
+cd gobble-drive
 npm install
 ```
 
@@ -109,7 +109,7 @@ npm install
 Create a `.env` file in the project root:
 ```env
 PORT=3000
-DATABASE_URL="postgresql://user:password@localhost:5432/gooble_drive?schema=public"
+DATABASE_URL="postgresql://user:password@localhost:5432/gobble_drive?schema=public"
 SESSION_SECRET="your_secret_key_here"
 SUPABASE_URL="https://your-supabase-project.supabase.co"
 SUPABASE_KEY="your-supabase-anon-key"
