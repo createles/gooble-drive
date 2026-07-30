@@ -257,7 +257,7 @@
   const syncDetailsPane = (item) => {
     // Populate Details Pane
     dom.details.name.textContent = item.dataset.name;
-    dom.details.type.textContent = item.dataset.type;
+    dom.details.type.textContent = item.dataset.mime || 'Folder';
     dom.details.size.textContent = item.dataset.size;
     dom.details.date.textContent = item.dataset.date;
   }
