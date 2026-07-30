@@ -11,33 +11,44 @@ const tutorialSteps = [
     expectedEvent: 'dblclick'
   },
   {
-    title: "Open a File",
-    message: "Double-click 'El Nido.jpg' to open it in a new tab.",
+    title: "Preview a File",
+    message: "Double-click 'El Nido.jpg' to open the image preview.",
     target: '[data-name="El Nido.jpg"]',
     expectedEvent: 'dblclick'
   },
   {
+    title: "Close Preview",
+    message: "Click the 'X' button to close the image preview.",
+    target: '#closePreviewModal',
+    expectedEvent: 'click'
+  },
+  {
     title: "Explore Item Options",
-    message: "Click the 3-dots on 'El Nido.jpg' to see actions like Rename or Download.",
+    message: "Close the preview if it's open, then click the 3-dots on 'El Nido.jpg' to see actions like Rename or Download.",
     target: '[data-name="El Nido.jpg"] .options-btn',
     expectedEvent: 'click'
   },
   {
+    title: "Close Options Menu",
+    message: "Click anywhere outside the menu to close it.",
+    target: null
+  },
+  {
     title: "Star a File",
-    message: "Click the star button to save this file for quick access later.",
+    message: "Click the star button on 'El Nido.jpg' to save this file for quick access later.",
     target: '[data-name="El Nido.jpg"] .star-toggle-btn',
     expectedEvent: 'click'
   },
   {
-    title: "Upload your own Files and Folders",
-    message: "Use the 'Upload' button to add your own files and folders to Gobble Drive.",
+    title: "Upload your own Files",
+    message: "Use the floating '+' button to add your own files and folders to Gobble Drive.",
     target: '#openUploadModal',
     expectedEvent: 'click'
   },
   {
     title: "You're ready to go!",
     message: "That's it! You're ready to start managing your own files. Happy Gobbling!",
-    target: null,
+    target: '#uploadModal .modal-content',
     isFinal: true
   }
 ];
@@ -55,33 +66,113 @@ function renderTutorialStep() {
   if (!modal || !overlay || !nextBtn) return;
 
   document.getElementById('tutorialTitle').innerText = step.title;
-  document.getElementById('tutorialMessage').innerText = step.message;
+  
+  const isMobile = window.innerWidth <= 768;
+  let dynamicMessage = step.message;
+  if (isMobile) {
+    dynamicMessage = dynamicMessage.replace(/Double-click/g, 'Click');
+  }
+  document.getElementById('tutorialMessage').innerText = dynamicMessage;
+  
   document.getElementById('tutorialStepCount').innerText = `${currentStep + 1} / ${tutorialSteps.length}`;
   nextBtn.innerText = step.isFinal ? "Finish" : "Next";
 
-  document.querySelectorAll('.tutorial-spotlight').forEach(el => el.classList.remove('tutorial-spotlight'));
+  document.querySelectorAll('.tutorial-spotlight').forEach(el => {
+    el.classList.remove('tutorial-spotlight');
+    if (el._tutorialAddedRelative) {
+      el.style.position = '';
+      delete el._tutorialAddedRelative;
+    }
+  });
+  document.querySelectorAll('.grid-item').forEach(el => {
+    if (el._tutorialElevated) {
+      el.style.zIndex = '';
+      delete el._tutorialElevated;
+    }
+  });
 
   const targetEl = step.target ? document.querySelector(step.target) : null;
 
   if (targetEl) {
     targetEl.classList.add('tutorial-spotlight');
     targetEl.style.opacity = '1';
+    
+    // Elevate element via z-index safely by ensuring it has a position
+    if (window.getComputedStyle(targetEl).position === 'static') {
+      targetEl.style.position = 'relative';
+      targetEl._tutorialAddedRelative = true;
+    }
+    
+    // Fix stacking context issue for nested elements (like options-btn in a grid-item)
+    // where a hover transform creates a new stacking context and drops it below the overlay
+    const gridItem = targetEl.closest('.grid-item');
+    if (gridItem && gridItem !== targetEl) {
+      gridItem.style.zIndex = '9001';
+      gridItem._tutorialElevated = true;
+    }
+    
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   positionModal(modal, targetEl);
 
-  if (step === tutorialSteps[1]) {
+  // Clean up any previous event listener
+  if (window._tutorialCurrentTarget && window._tutorialCurrentHandler) {
+    window._tutorialCurrentTarget.removeEventListener(window._tutorialCurrentEvent, window._tutorialCurrentHandler);
+  }
+
+  if (step.expectedEvent && targetEl) {
+    const eventToListen = (step.expectedEvent === 'dblclick' && isMobile) ? 'click' : step.expectedEvent;
+    
+    window._tutorialCurrentTarget = targetEl;
+    window._tutorialCurrentEvent = eventToListen;
+    window._tutorialCurrentHandler = (e) => {
+      // Small delay allows the UI action (like opening a modal or menu) to trigger first
+      setTimeout(() => {
+        // For Step 1 (index 1), folder navigation handles the reload, but we can safely call handleNext to update localStorage
+        handleNext();
+      }, 50);
+    };
+    targetEl.addEventListener(eventToListen, window._tutorialCurrentHandler, { once: true });
+    
+    // Hide the Next button so the user MUST interact with the element
     nextBtn.style.display = 'none';
+  } else {
+    nextBtn.style.display = 'block';
   }
 
-  if (step === tutorialSteps[3] && dom?.options?.menu) {
-    dom.options.menu.style.zIndex = '9002'; // Ensure options menu appears above modal
-    dom.options.menu.style.top = '0';
-    dom.options.menu.style.left = '0';
+  if (step === tutorialSteps[3]) {
+    // Elevate the preview modal so the close button spotlight appears above the tutorial overlay
+    if (dom?.modals?.preview) {
+      dom.modals.preview.style.zIndex = '9002';
+    }
   }
 
-  if (step === tutorialSteps[5] && dom?.modals?.upload) {
+  if (step === tutorialSteps[4]) {
+    // If we're on the options step, make sure the preview modal is closed
+    // so it doesn't block the UI for clicking the options button
+    if (dom?.modals?.preview) {
+      dom.modals.preview.style.zIndex = '';
+      dom.modals.preview.classList.remove('active', 'show');
+      document.body.classList.remove('modal-open');
+    }
+    
+    if (dom?.options?.menu) {
+      dom.options.menu.style.zIndex = '9002'; // Ensure options menu appears above modal
+      dom.options.menu.style.top = '0';
+      dom.options.menu.style.left = '0';
+    }
+  }
+
+  if (step === tutorialSteps[6]) {
+    // Ensure options menu is closed so it doesn't obstruct the star button
+    if (dom?.options?.menu) {
+      dom.options.menu.style.zIndex = '';
+      dom.options.menu.classList.remove('active', 'show');
+    }
+  }
+
+  if (step === tutorialSteps[8] && dom?.modals?.upload) {
     dom.modals.upload.style.zIndex = '9002'; // Ensure upload modal appears above tutorial
   }
 
@@ -146,10 +237,22 @@ function positionModal(modal, target) {
   }
 
   const rect = target ? target.getBoundingClientRect() : null;
+  const wasActive = modal.classList.contains('active');
+  if (!wasActive) {
+    modal.style.visibility = 'hidden';
+    modal.classList.add('active');
+  }
+  
   const modalWidth = modal.getBoundingClientRect().width || 300;
-  const modalHeight = modal.offsetHeight || modal.getBoundingClientRect().height;
-  const padding = 15;
-  const minMargin = 20;
+  const modalHeight = modal.offsetHeight || modal.getBoundingClientRect().height || 180;
+  
+  if (!wasActive) {
+    modal.classList.remove('active');
+    modal.style.visibility = '';
+  }
+
+  const padding = 20;
+  const minMargin = 32;
 
   if (!rect) {
     modal.style.position = 'fixed';
@@ -211,7 +314,28 @@ async function finishTutorial() {
   modal?.classList.remove('active');
   overlay?.classList.remove('active');
 
-  document.querySelectorAll('.tutorial-spotlight').forEach(el => el.classList.remove('tutorial-spotlight'));
+  document.querySelectorAll('.tutorial-spotlight').forEach(el => {
+    el.classList.remove('tutorial-spotlight');
+    if (el._tutorialAddedRelative) {
+      el.style.position = '';
+      delete el._tutorialAddedRelative;
+    }
+  });
+  document.querySelectorAll('.grid-item').forEach(el => {
+    if (el._tutorialElevated) {
+      el.style.zIndex = '';
+      delete el._tutorialElevated;
+    }
+  });
+
+  // Close all active modals and reset z-index
+  if (window.dom?.modals) {
+    Object.values(window.dom.modals).forEach(m => {
+      m.classList.remove('show', 'active');
+      m.style.zIndex = '';
+    });
+    document.body.classList.remove('modal-open');
+  }
 
   try {
     await fetch('/user/complete-tutorial', {
