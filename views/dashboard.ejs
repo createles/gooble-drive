@@ -443,21 +443,7 @@
   });
 
   // === SHARE FEATURE (Fetch API) ===
-  const openShareModal = (itemId, itemType) => {
-    dom.share.itemId.value = itemId;
-    dom.share.itemType.value = itemType;
-    toggleUI(dom.modals.share, true);
-  };
-
-  dom.options.share?.addEventListener('click', () => {
-    hideOptionsMenu();
-    const itemId = dom.options.menu.dataset.activeId;
-    const itemType = dom.options.menu.dataset.activeType;
-    openShareModal(itemId, itemType);
-  });
-
-  async function handleShareClick() {
-    // payload = file to share's id and selected duration
+  const generateShareLink = async () => {
     const payload = {
       itemId: dom.share.itemId.value,
       itemType: dom.share.itemType.value,
@@ -474,16 +460,71 @@
 
       if (data.shareLink) {
         dom.share.linkInput.value = data.shareLink;
+        const btn = document.getElementById('generateAndCopyBtn');
+        if (btn) {
+          btn.innerHTML = '<i class="ph-duotone ph-copy"></i> Copy Link';
+        }
       }
     } catch (err) {
       console.error("Share failed", err);
-      alert("Could not generate link.");
+      dom.share.linkInput.value = "Error generating link";
+    }
+  };
+
+  const openShareModal = (itemId, itemType) => {
+    dom.share.itemId.value = itemId;
+    dom.share.itemType.value = itemType;
+    dom.share.linkInput.value = "Generating...";
+    const btn = document.getElementById('generateAndCopyBtn');
+    if (btn) {
+      btn.innerHTML = '<i class="ph-duotone ph-spinner"></i> Wait...';
+    }
+    toggleUI(dom.modals.share, true);
+    
+    // Auto generate link
+    generateShareLink();
+  };
+
+  if (dom.share.duration) {
+    dom.share.duration.addEventListener('change', generateShareLink);
+  }
+
+  dom.options.share?.addEventListener('click', () => {
+    hideOptionsMenu();
+    const itemId = dom.options.menu.dataset.activeId;
+    const itemType = dom.options.menu.dataset.activeType;
+    openShareModal(itemId, itemType);
+  });
+
+  async function handleShareClick() {
+    if (!dom.share.linkInput.value || dom.share.linkInput.value.startsWith("Generating") || dom.share.linkInput.value.startsWith("Error")) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(dom.share.linkInput.value);
+      const btn = document.getElementById('generateAndCopyBtn');
+      if (btn) {
+        btn.innerHTML = '<i class="ph-duotone ph-check"></i> Copied!';
+        btn.style.backgroundColor = '#10b981';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#10b981';
+        setTimeout(() => {
+          btn.innerHTML = '<i class="ph-duotone ph-copy"></i> Copy Link';
+          btn.style.backgroundColor = '';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Could not copy", err);
     }
   }
 
-  async function copyGeneratedLink() {
-    await navigator.clipboard.writeText(dom.share.linkInput.value);
-    alert("Link copied to clipboard!");
+  const closeShareModalBtn = document.getElementById('closeShareModal');
+  if (closeShareModalBtn) {
+    closeShareModalBtn.addEventListener('click', () => {
+      toggleUI(dom.modals.share, false);
+    });
   }
 
 

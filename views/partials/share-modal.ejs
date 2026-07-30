@@ -1,30 +1,35 @@
-<div id="shareModal" class="modal-overlay modal">
+<div id="shareModal" class="modal-overlay">
   <div class="modal-content"> 
-    <h3><i class="ph-duotone ph-share-network"></i> Share File</h3>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+      <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;"><i class="ph-duotone ph-share-network"></i> Share Link</h3>
+      <button class="close-modal" id="closeShareModalHeader" aria-label="Close modal" type="button">
+        <i class="ph-duotone ph-x"></i>
+      </button>
+    </div>
     
-    <div id="shareSetup" class="modal-section">
-      <input type="hidden" id="shareItemId">
-      <input type="hidden" id="shareItemType" value="file">
-      
-      <label for="shareDuration">Link Duration:</label>
-      <select id="shareDuration">
+    <input type="hidden" id="shareItemId">
+    <input type="hidden" id="shareItemType" value="file">
+    
+    <div style="margin-bottom: 1.25rem;">
+      <label for="shareDuration" style="display:block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Link Duration</label>
+      <select id="shareDuration" style="width: 100%; padding: 0.8rem; border: 1.5px solid var(--border-light); outline: 2px solid var(--focus-ring); border-radius: 8px; font-family: inherit; font-size: 1rem; background: var(--surface-color); color: var(--text-main); cursor: pointer; transition: all 0.2s ease;">
         <option value="3600000">1 Hour</option>
         <option value="86400000" selected>1 Day</option>
         <option value="604800000">1 Week</option>
+        <option value="2592000000">1 Month</option>
       </select>
-      
-      <div class="modal-buttons"> 
-        <button class="btn-primary" onclick="handleShareClick()"><i class="ph-duotone ph-link"></i> Generate Link</button>
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display:block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Shareable Link</label>
+      <div class="link-copy-box" style="display: flex; gap: 0.5rem; padding: 4px; border: 1.5px solid var(--border-light); outline: 2px solid var(--focus-ring); border-radius: 10px; background: var(--surface-color); transition: all 0.2s ease;">
+        <input type="text" id="generatedLink" readonly placeholder="Ready to generate..." style="flex-grow: 1; padding: 0.6rem 0.8rem; border: none; font-family: inherit; font-size: 0.9rem; background: transparent; color: var(--text-main); outline: none;">
+        <button class="btn-primary" id="generateAndCopyBtn" onclick="handleShareClick()" style="white-space: nowrap; width: 140px; border-radius: 6px;"><i class="ph-duotone ph-link"></i> Generate Link</button>
       </div>
     </div>
-
-    <div id="shareResult" class="modal-section">
-      <p>Your shareable link is ready:</p>
-      <div class="link-copy-box">
-        <input type="text" id="generatedLink" readonly>
-        <button class="btn-primary" onclick="copyGeneratedLink()"><i class="ph-duotone ph-copy"></i> Copy Link</button>
-      </div>
-      <button class="btn-secondary" id="closeShareModal">Close</button>
+    
+    <div class="modal-buttons" style="display: flex; justify-content: flex-end;">
+      <button class="btn-secondary" id="closeShareModal">Done</button>
     </div>
   </div>
 </div>
