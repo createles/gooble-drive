@@ -53,6 +53,13 @@
   
   <script>
 
+    // === MOBILE STATE ===
+    let isMobile = false;
+    const checkMobile = () => { isMobile = window.innerWidth <= 768; };
+    document.addEventListener('DOMContentLoaded', checkMobile);
+    window.addEventListener('resize', checkMobile);
+    checkMobile(); // Run immediately in case script loads late
+
     // === DOM ELEMENTS ===
     const dom = {
     layout: document.querySelector('.dashboard-layout'),
@@ -263,7 +270,22 @@
 
     if (item.tagName === 'A') e.preventDefault();
 
+    // On mobile, single click acts like double click (opens file/folder)
+    if (isMobile) {
+      const itemType = item.dataset.type;
+      if (itemType === 'folder') {
+        const destination = item?.getAttribute('href');
+        if (destination) window.location.href = destination;
+      } else if (itemType === 'file') {
+        const fileUrl = item.dataset.url || `/download/${item.dataset.id}`;
+        const mimeType = item.dataset.mime || 'application/octet-stream';
+        if (fileUrl) openPreviewModal(item.dataset.name, fileUrl, mimeType);
+      }
+      return; // Skip syncing details pane on mobile
+    }
+
     syncDetailsPane(item);
+    dom.layout.classList.add('show-details');
   });
 
   // Double click allows navigating into a folder or opening a file in a new tab
@@ -861,14 +883,21 @@
   document.addEventListener('click', (e) => {
     const treeItem = e.target.closest('.tree-item');
     if (treeItem) {
+      const isCaretClick = e.target.closest('.caret-icon');
       const folderId = treeItem.getAttribute('data-folder-id');
+
+      // On mobile, single click navigates into the folder (unless clicking the caret)
+      if (isMobile && !isCaretClick) {
+        window.location.href = `/dashboard/${folderId}`;
+        return;
+      }
+
       const nestedTree = document.getElementById(`nested-${folderId}`);
-      const caret = treeItem.querySelector('.caret-icon');
 
       // If it has a nested tree, toggle its visibility
       if (nestedTree) {
-        nestedTree.classList.toggle('show-node');
-        if (caret) caret.classList.toggle('open');
+        nestedTree.classList.toggle('open');
+        treeItem.classList.toggle('open');
       }
     }
   });
