@@ -8,6 +8,33 @@
 
 ---
 
+## 📸 アプリケーション プレビュー
+
+### デスクトップ表示
+
+| ランディングページ | ダッシュボード |
+| :---: | :---: |
+| ![ランディングページ](public/preview/gobble-drive-landing.png) | ![ダッシュボード](public/preview/gobble-drive-dashboard.png) |
+
+<details>
+<summary><b>その他のデスクトップ画面を表示（アップロード、プレビュー、新規登録）</b></summary>
+
+<br />
+
+| ファイルアップロード | ファイルプレビュー | 新規登録画面 |
+| :---: | :---: | :---: |
+| ![ファイルアップロード](public/preview/gobble-drive-upload.png) | ![ファイルプレビュー](public/preview/gobble-drive-img-preview.png) | ![新規登録画面](public/preview/gobble-drive-signup.png) |
+
+</details>
+
+### モバイル表示
+
+| モバイル認証 | モバイルダッシュボード |
+| :---: | :---: |
+| <img src="public/preview/gobble-drive-mobile-auth.png" alt="モバイル認証" width="260" /> | <img src="public/preview/gobble-drive-mobile-dashboard.png" alt="モバイルダッシュボード" width="260" /> |
+
+---
+
 ## 🌟 主な機能
 
 - 🔐 **ユーザー認証とセッションの永続化**
@@ -72,6 +99,7 @@ gobble-drive/
 │   ├── schema.prisma           # データベースモデル (User, Session, Folder, File, Share)
 │   └── migrations/             # データベースマイグレーション履歴
 ├── public/
+│   ├── preview/                # アプリケーションプレビュー画像
 │   ├── style.css               # Google Drive にインスパイアされたカスタム CSS
 │   ├── scripts/                # フロントエンドスクリプト（チュートリアル、モーダル）
 │   └── gobble_drive_logo.svg   # プロジェクトロゴ・ファビコン

@@ -8,6 +8,33 @@
 
 ---
 
+## 📸 Application Previews
+
+### Desktop Views
+
+| Landing Page | Dashboard |
+| :---: | :---: |
+| ![Landing Page](public/preview/gobble-drive-landing.png) | ![Dashboard](public/preview/gobble-drive-dashboard.png) |
+
+<details>
+<summary><b>Click to reveal more desktop screens (Upload, Preview, Sign Up)</b></summary>
+
+<br />
+
+| File Upload | File Preview | Sign Up Page |
+| :---: | :---: | :---: |
+| ![File Upload](public/preview/gobble-drive-upload.png) | ![File Preview](public/preview/gobble-drive-img-preview.png) | ![Sign Up Page](public/preview/gobble-drive-signup.png) |
+
+</details>
+
+### Mobile Views
+
+| Mobile Auth | Mobile Dashboard |
+| :---: | :---: |
+| <img src="public/preview/gobble-drive-mobile-auth.png" alt="Mobile Auth" width="260" /> | <img src="public/preview/gobble-drive-mobile-dashboard.png" alt="Mobile Dashboard" width="260" /> |
+
+---
+
 ## 🌟 Key Features
 
 - 🔐 **User Authentication & Session Persistence**
@@ -72,6 +99,7 @@ gobble-drive/
 │   ├── schema.prisma           # Database models (User, Session, Folder, File, Share)
 │   └── migrations/             # Database migration history
 ├── public/
+│   ├── preview/                # Application preview screenshots
 │   ├── style.css               # Google Drive inspired custom CSS design
 │   ├── scripts/                # Front-end interactivity (tutorial, modals)
 │   └── gobble_drive_logo.svg   # Project logo & favicons
