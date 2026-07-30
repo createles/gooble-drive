@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma.js' // the project's prisma client
 // -- Sign Up Handlers -- 
 export const getSignup = (req, res) => {
       res.render("sign-up-form", {
-        title: 'Gobble Drive - Sign Up',
+        title: 'Sign Up',
         errorMessage: req.flash('error'), // pass notif messages to ejs
         successMessage: req.flash('success')
     })
@@ -110,7 +110,7 @@ export const postSignup = async (req, res, next) => {
 // -- Login Handlers -- 
 export const getLogin = (req, res) => {
   res.render('login', {
-    title: 'Gobble Drive - Log in',
+    title: 'Log in',
     errorMessage: req.flash('error'),
     successMessage: req.flash('success')
   })

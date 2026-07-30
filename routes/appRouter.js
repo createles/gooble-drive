@@ -26,7 +26,7 @@ const appRouter = Router();
 // Check for login status: yes -> dashboard // no -> homepage
 appRouter.get('/', isLoggedIn, (req, res) => {
   res.render('homepage', {
-    title: 'Gobble Drive - Welcome'
+    title: 'Welcome'
   });
 });
 

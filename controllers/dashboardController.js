@@ -177,7 +177,7 @@ export const getRecentPage = async (req, res) => {
     };
 
     res.render('dashboard', { 
-        title: 'Gobble Drive - Recent Files',
+        title: 'Recent Files',
         sidebarTree: folderTree,
         showTutorial: false,
         viewMode: 'recent',
@@ -225,7 +225,7 @@ export const getStarredPage = async (req, res) => {
     const folderTree = buildFolderTree(allFolders);
 
     res.render('dashboard', { 
-        title: 'Gobble Drive - Starred',
+        title: 'Starred',
         sidebarTree: folderTree, 
         showTutorial: false,
         viewMode: 'starred',
