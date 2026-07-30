@@ -32,6 +32,8 @@
   <%- include('partials/move-modal.ejs') %>
   <%- include('partials/log-out-modal.ejs') %>
   <%- include('partials/preview-modal.ejs') %>
+  <%- include('partials/rename-modal.ejs') %>
+  <%- include('partials/delete-modal.ejs') %>
 
   <% if (viewMode !== 'recent') { %>
     <%- include('partials/add-btn.ejs') %>
@@ -76,7 +78,9 @@
       share: document.getElementById('shareModal'),
       move: document.getElementById('moveModal'),
       logout: document.getElementById('logoutModal'),
-      preview: document.getElementById('previewModal')
+      preview: document.getElementById('previewModal'),
+      rename: document.getElementById('renameModal'),
+      delete: document.getElementById('deleteModal')
     },
     upload: {
       fileInput: document.getElementById('file'),
@@ -484,7 +488,17 @@
 
 
   // === RENAME FILE/FOLDER LOGIC ===
+  const renameForm = document.getElementById('renameForm');
+  const renameInput = document.getElementById('renameInput');
+  const renameItemType = document.getElementById('renameItemType');
+  const closeRenameModal = document.getElementById('closeRenameModal');
+  
+  closeRenameModal.addEventListener('click', () => {
+    toggleUI(dom.modals.rename, false);
+  });
+
   dom.options.rename.addEventListener('click', async () => {
+    hideOptionsMenu();
     const id = dom.options.menu.dataset.activeId;
     const type = dom.options.menu.dataset.activeType;
     
@@ -494,7 +508,23 @@
     if (!itemElement) return console.error("Could not find element to rename");
     
     const oldName = itemElement.querySelector('.item-name').innerText;
-    const newName = prompt(`Enter new name for this ${type}:`, oldName);
+    renameItemType.textContent = type;
+    renameInput.value = oldName;
+    
+    renameForm.dataset.id = id;
+    renameForm.dataset.type = type;
+    renameForm.dataset.oldName = oldName;
+    
+    toggleUI(dom.modals.rename, true);
+    setTimeout(() => renameInput.focus(), 100);
+  });
+
+  renameForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = renameForm.dataset.id;
+    const type = renameForm.dataset.type;
+    const oldName = renameForm.dataset.oldName;
+    const newName = renameInput.value.trim();
 
     if (newName && newName !== oldName) {
       const response = await fetch(`/${type}s/${id}/rename`, {
@@ -508,24 +538,46 @@
       } else {
         alert(`Could not rename ${type}. Please try again.`);
       }
+    } else {
+      toggleUI(dom.modals.rename, false);
     }
   });
 
 
   // === DELETE FILE/FOLDER LOGIC ===
+  const closeDeleteModal = document.getElementById('closeDeleteModal');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  const deleteItemType = document.getElementById('deleteItemType');
+  const deleteItemName = document.getElementById('deleteItemName');
+  
+  closeDeleteModal.addEventListener('click', () => {
+    toggleUI(dom.modals.delete, false);
+  });
+
   dom.options.delete.addEventListener('click', async () => {
+    hideOptionsMenu();
     const itemId = dom.options.menu.dataset.activeId;
     const itemType = dom.options.menu.dataset.activeType;
+    const itemName = dom.options.menu.dataset.activeName;
     
-    const confirmDelete = confirm(`Are you sure you want to delete this ${itemType}?`);
-    if (!confirmDelete) return;
+    deleteItemType.textContent = itemType;
+    deleteItemName.textContent = itemName;
+    
+    confirmDeleteBtn.dataset.id = itemId;
+    confirmDeleteBtn.dataset.type = itemType;
+    
+    toggleUI(dom.modals.delete, true);
+  });
+  
+  confirmDeleteBtn.addEventListener('click', async () => {
+    const itemId = confirmDeleteBtn.dataset.id;
+    const itemType = confirmDeleteBtn.dataset.type;
 
     try {
       // Determine route based on type
       const route = `/${itemType}s/${itemId}/delete`;
       
       const response = await fetch(route, { method: 'DELETE' });
-      // Holds json object containing success status after calling deleteFile
       const result = await response.json();
 
 
